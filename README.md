@@ -1,7 +1,54 @@
-## Description
-Simple implementation of the JSON:API specification (only required output fields)
+## Overview
+Simple implementation of the [JSON:API](https://jsonapi.org) specification (only required output fields).
+This library implements only top-level fields: **data**, **errors** and **meta** without any **relationships**, **includes**
+and others. 
 
-## Example responses
+Often we only need standard of output all our endpoints especially when using many types of communications like HTTP query,
+websockets, queues etc and don't need complex entities inner relationships in our API but it's good if implementing some
+exists standards so this library for this goals.
+
+## Usage
+Each response DTO should contain the annotation ```@JsonApiType("resource-type")``` with any resource type identifier and
+the annotation ```@JsonApiId``` without arguments on field which will be unique identifier this item, usually this 
+field is ```id```.
+
+If you want to use request filters with annotation ```@RequestJsonApiFilter``` add argument resolver in your configuration 
+for example:
+```java
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ApplicationConfig implements WebMvcConfigurer {
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(new JsonApiFilterArgumentResolver());
+    }
+}
+```
+
+Then you can use annotation ```@RequestJsonApiFilter``` in controllers for example:
+```java
+@Slf4j
+@RestController
+@AllArgsConstructor
+@RequestMapping(value = "/app", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class RestController {
+    @JsonGetMapping
+    public Response<Void> get(final @RequestJsonApiFilter Filter filter) throws Exception {
+        if (filter.hasParam("key")) {
+            final List<String> filterValues = filter.getParam("key");
+
+            // do something with filter param
+        }
+        return Response.<Void, Void>builder()
+           .build();
+    }
+}
+```
+Now if request will be contain fields like ```filter[key1]=value1,value2&filter[key2]=value1``` we can get them in the
+```Filter``` object.
+
+### Other response examples
 Example response with one data object:
 ```java
 // Pseudo code
@@ -14,7 +61,7 @@ public static class TestDto {
 }
 
 public class Test {
-    public Response<Data<TestDto>> main() {
+    public Response<TestDto> main() {
         return Response.<TestDto, TestDto>builder()
             .data(
                 TestDto.builder()
