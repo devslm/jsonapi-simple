@@ -1,4 +1,4 @@
-package com.slm.jsonapi.simple.response;
+package io.github.seregaslm.jsonapi.simple.test.response;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

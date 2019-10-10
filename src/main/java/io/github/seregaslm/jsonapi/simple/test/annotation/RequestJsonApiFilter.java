@@ -1,6 +1,6 @@
-package com.slm.jsonapi.simple.annotation;
+package io.github.seregaslm.jsonapi.simple.test.annotation;
 
-import com.slm.jsonapi.simple.request.Filter;
+import io.github.seregaslm.jsonapi.simple.test.request.Filter;
 
 import java.lang.annotation.*;
 

@@ -1,7 +1,5 @@
-package com.slm.jsonapi.simple;
+package io.github.seregaslm.jsonapi.simple.test.response;
 
-import com.slm.jsonapi.simple.response.Data;
-import com.slm.jsonapi.simple.response.Response;
 import lombok.NonNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;

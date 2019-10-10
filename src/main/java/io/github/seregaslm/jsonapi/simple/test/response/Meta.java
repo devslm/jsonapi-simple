@@ -1,4 +1,4 @@
-package com.slm.jsonapi.simple.response;
+package io.github.seregaslm.jsonapi.simple.test.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;

@@ -1,4 +1,4 @@
-package com.slm.jsonapi.simple.response;
+package io.github.seregaslm.jsonapi.simple.test.response;
 
 import lombok.Setter;
 import lombok.experimental.Accessors;

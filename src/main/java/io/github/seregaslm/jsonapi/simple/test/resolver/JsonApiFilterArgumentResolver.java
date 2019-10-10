@@ -1,7 +1,7 @@
-package com.slm.jsonapi.simple.resolver;
+package io.github.seregaslm.jsonapi.simple.test.resolver;
 
-import com.slm.jsonapi.simple.annotation.RequestJsonApiFilter;
-import com.slm.jsonapi.simple.request.Filter;
+import io.github.seregaslm.jsonapi.simple.test.annotation.RequestJsonApiFilter;
+import io.github.seregaslm.jsonapi.simple.test.request.Filter;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
