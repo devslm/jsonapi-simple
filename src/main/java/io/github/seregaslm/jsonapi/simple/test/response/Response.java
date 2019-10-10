@@ -179,7 +179,19 @@ public class Response<T> {
          * @return self link
          */
         public ResponseBuilder<T, V> error(final HttpStatus status, final String detail) {
-            return error(status, null, detail);
+            return error(status, null, detail, null);
+        }
+
+        /**
+         * @see ResponseBuilder#error(HttpStatus, String, String, String)
+         *
+         * @param status spring {@link HttpStatus} object
+         * @param code internal SMM error code (if exists)
+         * @param detail detail information about error
+         * @return self link
+         */
+        public ResponseBuilder<T, V> error(final HttpStatus status, final String code, final String detail) {
+            return error(status, code, detail, null);
         }
 
         /**
@@ -189,16 +201,27 @@ public class Response<T> {
          * result object will contain all errors we passed.
          *
          * @param status spring {@link HttpStatus} object
-         * @param code internal application specific error code (if required)
+         * @param code internal SMM error code (if exists)
          * @param detail detail information about error
+         * @param errorValidationField field with failed validation
          * @return self link
          */
-        public ResponseBuilder<T, V> error(final HttpStatus status, final String code, final @NonNull String detail) {
+        public ResponseBuilder<T, V> error(final HttpStatus status,
+                                           final String code,
+                                           final @NonNull String detail,
+                                           final String errorValidationField) {
             if (this.errors == null) {
                 this.errors = new ArrayList<>();
             }
+            Error.Source errorSource = null;
+
+            if (StringUtils.hasText(errorValidationField)) {
+                errorSource = Error.Source.builder()
+                    .parameter(errorValidationField)
+                    .build();
+            }
             this.errors.add(
-                new Error(status.value(), code, detail)
+                new Error(status.value(), code, detail, errorSource)
             );
             this.dataList = null;
             this.dataObject = null;

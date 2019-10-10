@@ -3,6 +3,7 @@ package io.github.seregaslm.jsonapi.simple.test.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
@@ -19,4 +20,14 @@ public class Error {
     private String code;
     @ApiModelProperty(value = "Error detail message", required = true)
     private String detail;
+    @ApiModelProperty(value = "Parameter name only for validation errors", required = false)
+    private Source source;
+
+    @Getter
+    @ToString
+    @Builder
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class Source {
+        private String parameter;
+    }
 }

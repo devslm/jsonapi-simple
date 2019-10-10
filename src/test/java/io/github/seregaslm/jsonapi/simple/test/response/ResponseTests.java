@@ -70,6 +70,18 @@ public class ResponseTests {
 		assertErrorResponse(response);
 	}
 
+	@Test
+	public void shouldReturnResponseWithErrorForValidationFails() {
+		final Response<Data<TestDto>> response = Response.<Data<TestDto>, TestDto>builder()
+			.error(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", ERROR_DESCRIPTION, "someField")
+			.build();
+
+		assertErrorResponse(response);
+
+		assertThat(response.getErrors().get(0).getCode(), is("VALIDATION_ERROR"));
+		assertThat(response.getErrors().get(0).getSource().getParameter(), is("someField"));
+	}
+
 	private void assertErrorResponse(final @NonNull Response<Data<TestDto>> response) {
 		assertThat(response.getData(), nullValue());
 
