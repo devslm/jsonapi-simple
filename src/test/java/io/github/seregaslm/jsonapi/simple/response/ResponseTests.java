@@ -1,10 +1,8 @@
 package io.github.seregaslm.jsonapi.simple.response;
 
 import lombok.NonNull;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -14,7 +12,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-@RunWith(SpringRunner.class)
 public class ResponseTests {
 	private static final UUID TEST_DTO_1_ID = UUID.randomUUID();
 	private static final String TEST_DTO_1_NAME = "TEST";
