@@ -177,20 +177,60 @@ public class Test {
 ```
 ```json
 {
-  "errors":[
+  "errors": [
     {
-      "status":400,
-      "code":"TOKEN_ERROR",
-      "detail":"Some errors occurred!"
+      "status": 400,
+      "code": "TOKEN_ERROR",
+      "detail": "Some errors occurred!"
     }
   ],
-  "meta":{
-    "api":{
-      "version":"1"
+  "meta": {
+    "api": {
+      "version": "1"
     },
-    "page":{
-      "maxSize":25,
-      "total":0
+    "page": {
+      "maxSize": 25,
+      "total": 0
+    }
+  }
+}
+```
+
+Example response with validation error and field name with invalid data (data is empty so we use ```Void``` 
+class as generic parameter):
+```java
+// Pseudo code
+public class Test {
+    public Response<Void> main() {
+        return Response.<Void, Void>builder()
+            .error(
+                HttpStatus.BAD_REQUEST,
+                "VALIDATION_ERROR", // This is app internal code for frontend to determine that is validation error
+                "Field must be greater 0!",
+                "field-name"
+            ).build();
+    }
+}
+```
+```json
+{
+  "errors": [
+    {
+      "status": 400,
+      "code": "VALIDATION_ERROR",
+      "detail": "Field must be greater 0!",
+      "source": {
+        "parameter": "field-name"
+      }
+    }
+  ],
+  "meta": {
+    "api": {
+      "version": "1"
+    },
+    "page": {
+      "maxSize": 25,
+      "total": 0
     }
   }
 }
