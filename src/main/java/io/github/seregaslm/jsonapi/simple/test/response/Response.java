@@ -172,7 +172,27 @@ public class Response<T> {
         }
 
         /**
-         * @see ResponseBuilder#error(HttpStatus, String, String)
+         * Add validation error with specified field name with invalid data.
+         *
+         * <p>Each invocation add new error object with field and error details
+         * to response.
+         *
+         * @param errorValidationField with name with invalid data
+         * @param detail detail information about validation problem
+         * @return self link
+         */
+        public ResponseBuilder<T, V> validationError(final @NonNull String errorValidationField,
+                                                     final @NonNull String detail) {
+            return error(
+                HttpStatus.BAD_REQUEST,
+                "VALIDATION_ERROR",
+                detail,
+                errorValidationField
+            );
+        }
+
+        /**
+         * @see ResponseBuilder#error(HttpStatus, String, String, String)
          *
          * @param status spring {@link HttpStatus} object
          * @param detail detail information about error
@@ -180,18 +200,6 @@ public class Response<T> {
          */
         public ResponseBuilder<T, V> error(final HttpStatus status, final String detail) {
             return error(status, null, detail, null);
-        }
-
-        /**
-         * @see ResponseBuilder#error(HttpStatus, String, String, String)
-         *
-         * @param status spring {@link HttpStatus} object
-         * @param code internal SMM error code (if exists)
-         * @param detail detail information about error
-         * @return self link
-         */
-        public ResponseBuilder<T, V> error(final HttpStatus status, final String code, final String detail) {
-            return error(status, code, detail, null);
         }
 
         /**

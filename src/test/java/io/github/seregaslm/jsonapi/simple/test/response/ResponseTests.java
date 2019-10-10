@@ -23,13 +23,8 @@ public class ResponseTests {
 
 	@Test
 	public void shouldReturnResponseWithDataAs1ObjectWithoutErrors() {
-		final TestDto testDto = new TestDto()
-			.setId(TEST_DTO_1_ID)
-			.setName(TEST_DTO_1_NAME)
-			.setCreateDate(TEST_DTO_1_DATE_CREATE);
-
 		final Response<Data<TestDto>> response = Response.<Data<TestDto>, TestDto>builder()
-			.data(testDto)
+			.data(getTestDto())
 			.build();
 
 		assertThat(response.getData().getAttributes().getId(), is(TEST_DTO_1_ID));
@@ -48,13 +43,8 @@ public class ResponseTests {
 
 	@Test
 	public void shouldReturnResponseWithErrorWithoutDataIfDataObjectPassed() {
-		final TestDto testDto = new TestDto()
-			.setId(TEST_DTO_1_ID)
-			.setName(TEST_DTO_1_NAME)
-			.setCreateDate(TEST_DTO_1_DATE_CREATE);
-
 		final Response<Data<TestDto>> response = Response.<Data<TestDto>, TestDto>builder()
-			.data(testDto)
+			.data(getTestDto())
 			.error(HttpStatus.BAD_REQUEST, ERROR_DESCRIPTION)
 			.build();
 
@@ -71,9 +61,10 @@ public class ResponseTests {
 	}
 
 	@Test
-	public void shouldReturnResponseWithErrorForValidationFails() {
-		final Response<Data<TestDto>> response = Response.<Data<TestDto>, TestDto>builder()
-			.error(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", ERROR_DESCRIPTION, "someField")
+	public void shouldReturnResponseWithValidationErrorWithoutDataIfDataObjectPassed() {
+		final Response<Void> response = Response.<Void, Void>builder()
+			.data(getTestDto())
+			.validationError("someField", ERROR_DESCRIPTION)
 			.build();
 
 		assertErrorResponse(response);
@@ -82,7 +73,26 @@ public class ResponseTests {
 		assertThat(response.getErrors().get(0).getSource().getParameter(), is("someField"));
 	}
 
-	private void assertErrorResponse(final @NonNull Response<Data<TestDto>> response) {
+	@Test
+	public void shouldReturnResponseWithValidationErrorWhenEmptyData() {
+		final Response<Void> response = Response.<Void, Void>builder()
+			.validationError("someField", ERROR_DESCRIPTION)
+			.build();
+
+		assertErrorResponse(response);
+
+		assertThat(response.getErrors().get(0).getCode(), is("VALIDATION_ERROR"));
+		assertThat(response.getErrors().get(0).getSource().getParameter(), is("someField"));
+	}
+
+	private TestDto getTestDto() {
+		return new TestDto()
+			.setId(TEST_DTO_1_ID)
+			.setName(TEST_DTO_1_NAME)
+			.setCreateDate(TEST_DTO_1_DATE_CREATE);
+	}
+
+	private void assertErrorResponse(final @NonNull Response<?> response) {
 		assertThat(response.getData(), nullValue());
 
 		assertThat(response.getErrors().get(0).getStatus(), is(HttpStatus.BAD_REQUEST.value()));

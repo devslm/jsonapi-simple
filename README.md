@@ -206,12 +206,8 @@ class as generic parameter):
 public class Test {
     public Response<Void> main() {
         return Response.<Void, Void>builder()
-            .error(
-                HttpStatus.BAD_REQUEST,
-                "VALIDATION_ERROR", // This is app internal code for frontend to determine that is validation error
-                "Field must be greater 0!",
-                "field-name"
-            ).build();
+            .validationError("field-name", "Field must be greater 0!")
+            .build();
     }
 }
 ```
