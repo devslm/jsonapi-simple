@@ -1,4 +1,4 @@
-package io.github.seregaslm.jsonapi.simple.test.annotation;
+package io.github.seregaslm.jsonapi.simple.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

@@ -1,6 +1,6 @@
-package io.github.seregaslm.jsonapi.simple.test.annotation;
+package io.github.seregaslm.jsonapi.simple.annotation;
 
-import io.github.seregaslm.jsonapi.simple.test.request.Filter;
+import io.github.seregaslm.jsonapi.simple.request.Filter;
 
 import java.lang.annotation.*;
 

@@ -1,7 +1,7 @@
-package io.github.seregaslm.jsonapi.simple.test.response;
+package io.github.seregaslm.jsonapi.simple.response;
 
-import io.github.seregaslm.jsonapi.simple.test.annotation.JsonApiId;
-import io.github.seregaslm.jsonapi.simple.test.annotation.JsonApiType;
+import io.github.seregaslm.jsonapi.simple.annotation.JsonApiId;
+import io.github.seregaslm.jsonapi.simple.annotation.JsonApiType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

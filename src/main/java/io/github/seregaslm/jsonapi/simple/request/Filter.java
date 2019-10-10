@@ -1,4 +1,4 @@
-package io.github.seregaslm.jsonapi.simple.test.request;
+package io.github.seregaslm.jsonapi.simple.request;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
