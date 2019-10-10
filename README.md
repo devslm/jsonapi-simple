@@ -7,6 +7,9 @@ Often we only need standard of output all our endpoints especially when using ma
 websockets, queues etc and don't need complex entities inner relationships in our API but it's good if implementing some
 exists standards so this library for this goals.
 
+## Docs
+[See project page](https://seregaslm.github.io/jsonapi-simple/)
+
 ## Usage
 Each response DTO should contain the annotation ```@JsonApiType("resource-type")``` with any resource type identifier and
 the annotation ```@JsonApiId``` without arguments on field which will be unique identifier this item, usually this 
