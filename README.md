@@ -36,7 +36,7 @@ Then you can use annotation ```@RequestJsonApiFilter``` in controllers for examp
 @AllArgsConstructor
 @RequestMapping(value = "/app", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class RestController {
-    @JsonGetMapping
+    @GetMapping
     public Response<Void> get(final @RequestJsonApiFilter Filter filter) throws Exception {
         if (filter.hasParam("key")) {
             final List<String> filterValues = filter.getParam("key");
