@@ -22,7 +22,7 @@ import java.util.List;
  * Rest response data type in JSON API format.
  *
  * <p>Implement only root JSON API fields as data, errors and meta.
- * See specification on: <url http="https://jsonapi.org/format/#document-top-level">jsonapi: document-top-level</url>
+ * See specification on: <a href="https://jsonapi.org/format/#document-top-level">jsonapi: document-top-level</a>
  * All other fields such as {@code relationships} and others
  * are skipped because we don't need them.
  *
@@ -54,7 +54,7 @@ public class Response<T> {
      * {@link JsonApiId}.
      * {@link JsonApiType} on the class describe the type of the entity and {@link JsonApiId}
      * describe id of this entity
-     * (see: <url http="https://jsonapi.org/format/#document-resource-object-identification">document-resource-object-identification</url>).
+     * (see: <a href="https://jsonapi.org/format/#document-resource-object-identification">document-resource-object-identification</a>).
      *
      * @param <T> response data type (may be object or array only)
      * @param <V> primary object type we work with, this object will be
@@ -340,6 +340,10 @@ public class Response<T> {
 
     /**
      * @see ResponseBuilder
+     *
+     * @param <T> response data object type
+     * @param <V> data object type using for prepare data field in response
+     * @return {@link ResponseBuilder} new instance
      */
     public static <T, V> ResponseBuilder<T, V> builder() {
         return new ResponseBuilder<>();

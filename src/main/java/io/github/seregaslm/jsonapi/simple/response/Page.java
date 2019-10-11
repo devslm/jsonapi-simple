@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
  * and then in controllers we can retrieve data object, total size of items
  * and pagination links for example:
  * <pre>
+ * {@code
  *     // Some service lass
  *     public Page<Dto> getItems() {
  *         return new Page<>()
@@ -28,8 +29,9 @@ import lombok.experimental.Accessors;
  *             .pageNext(page.getNext())
  *             .build();
  *     }
+ * }
  * </pre>
- * @param <T>
+ * @param <T> data object type
  */
 @Setter
 @Accessors(chain = true)

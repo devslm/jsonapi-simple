@@ -17,7 +17,7 @@ import java.util.stream.Stream;
  * <p>By default using {@code filter} param name and key names in square brackets,
  * for example {@code filter[id]=123,345&filter[name]=test}. After parsing will be
  * create new {@link Filter} object with the map of finded filters. Each value is
- * {@link List<String>} object.
+ * {@link List} of stings object.
  *
  * <p>This filter must be registered in Spring application.
  */
