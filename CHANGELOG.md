@@ -2,7 +2,7 @@
 
 ## [1.0.0] - 2019-10-16
 #### Added:
-  - Base logic
+  - Basic logic
   - README file with documentation
   - CHANGELOG.md file
   - Global lombok config
