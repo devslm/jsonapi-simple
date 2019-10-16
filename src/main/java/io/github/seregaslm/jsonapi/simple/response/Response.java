@@ -143,22 +143,26 @@ public class Response<T> {
         private String getJsonApiIdFieldValue(final Object object) {
             String value = null;
             boolean isJsonApiIdFieldPresent = false;
+            Class<?> type = object.getClass();
 
-            for (final Field field : object.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(JsonApiId.class)) {
-                    try {
-                        field.setAccessible(true);
+            while (type != null) {
+                for (final Field field : type.getDeclaredFields()) {
+                    if (field.isAnnotationPresent(JsonApiId.class)) {
+                        try {
+                            field.setAccessible(true);
 
-                        value = field.get(object).toString();
-                        isJsonApiIdFieldPresent = true;
+                            value = field.get(object).toString();
+                            isJsonApiIdFieldPresent = true;
 
-                        field.setAccessible(false);
-                    } catch (Exception exception) {
-                        LOGGER.error("Could not retrieve json api id field from: {}! Reason: {}",
-                            object.getClass().getName(), exception.getMessage());
+                            field.setAccessible(false);
+                        } catch (Exception exception) {
+                            LOGGER.error("Could not retrieve json api id field from: {}! Reason: {}",
+                                object.getClass().getName(), exception.getMessage());
+                        }
+                        break;
                     }
-                    break;
                 }
+                type = type.getSuperclass();
             }
 
             if (isJsonApiIdFieldPresent
