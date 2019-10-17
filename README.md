@@ -11,6 +11,15 @@ exists standards so this library for this goals.
 [See project page](https://seregaslm.github.io/jsonapi-simple/)
 
 ## Usage
+Add dependency to your project:
+```xml
+<dependency>
+    <groupId>io.github.seregaslm</groupId>
+    <artifactId>jsonapi-simple</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
 Each response DTO should contain the annotation ```@JsonApiType("resource-type")``` with any resource type identifier and
 the annotation ```@JsonApiId``` without arguments on field which will be unique identifier this item, usually this 
 field is ```id```.
