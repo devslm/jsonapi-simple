@@ -24,6 +24,53 @@ Each response DTO should contain the annotation ```@JsonApiType("resource-type")
 the annotation ```@JsonApiId``` without arguments on field which will be unique identifier this item, usually this 
 field is ```id```.
 
+Each response may contain generics (if you planning to use SWAGGER) or may not (without SWAGGER), for example both 
+variants correct:
+```java
+public class RestController {
+    // The simplest option without SWAGGER support
+    public Response responseWithoutGenerics() {
+        return Response.builder()
+                   .build();
+    }
+  
+    // This option will display correctly in SWAGGER with all DTO fields 
+    public Response<SomeDto> responseWithGenerics() {
+        return Response.<SomeDto, SomeDto>builder()
+                   .build();
+    }
+}
+```
+
+Parametrized response may be 2 types:
+  - as list - first parameter in response builder must be only ```<List<Data<YourDto>>>```:
+    ```java
+    public class RestController {
+        public Response<List<Data<SomeDto>>> responseAsList() {
+            return Response.<List<Data<SomeDto>>, SomeDto>builder()
+                       .build();
+        }
+    }
+    ```
+  - as object:
+    ```java
+    public class RestController {
+        public Response<SomeDto> responseAsObject() {
+            return Response.<SomeDto, SomeDto>builder()
+                       .build();
+        }
+    }
+    ```
+  - as empty response with ```Void``` class as parameter:
+    ```java
+    public class RestController {
+        public Response<Void> responseAsObject() {
+            return Response.<Void, Void>builder()
+                       .build();
+        }
+    }
+    ```
+
 If you want to use request filters with annotation ```@RequestJsonApiFilter``` add argument resolver in your configuration 
 for example:
 ```java
