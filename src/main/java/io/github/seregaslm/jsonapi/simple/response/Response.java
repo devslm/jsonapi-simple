@@ -79,12 +79,36 @@ public class Response<T> {
             );
         }
 
+        /**
+         * See {@link ResponseBuilder#uri(String, String...)}.
+         *
+         * @param uriPrefix uri prefix with/without spring placeholders
+         * @throws IllegalArgumentException if number placeholders and arguments are different
+         * @return self link
+         */
         public ResponseBuilder<T, V> uri(final @NonNull String uriPrefix) {
             uri(uriPrefix, null);
 
             return this;
         }
 
+        /**
+         * Set uri prefix for any generated links i.e. self, related etc.
+         *
+         * We can use spring placeholders the same as in the {@link @RequestMapping} annotations:
+         * <pre>
+         *     /api/v1
+         *     /api/v1/users/${userId}
+         *     /api/v1/users/{userId}
+         *     /api/v1/users/{user_id}
+         * </pre>
+         * Both underscore and camel case are supported.
+         *
+         * @param uriPrefix uri prefix with/without spring placeholders
+         * @param uriArgs spring placeholders arguments if required
+         * @throws IllegalArgumentException if number placeholders and arguments are different
+         * @return self link
+         */
         public ResponseBuilder<T, V> uri(final @NonNull String uriPrefix, final String... uriArgs) {
             final StringBuilder buffer = new StringBuilder(uriPrefix);
 
@@ -130,6 +154,12 @@ public class Response<T> {
             }
         }
 
+        /**
+         * Set api version.
+         *
+         * @param apiVersion api version for meta data
+         * @return self link
+         */
         public ResponseBuilder<T, V> apiVersion(final @NonNull String apiVersion) {
             this.meta.getApi().setVersion(apiVersion);
 
@@ -139,8 +169,8 @@ public class Response<T> {
         /**
          * Set data for response.
          *
-         * @param data data object of {@link Collection} or {@link Object} type.
-         * @return self link.
+         * @param data data object of {@link Collection} or {@link Object} type
+         * @return self link
          */
         @SuppressWarnings("unchecked")
         public ResponseBuilder<T, V> data(final Object data) {
