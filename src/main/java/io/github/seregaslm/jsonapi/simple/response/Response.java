@@ -69,12 +69,71 @@ public class Response<T> {
         private String dataType;
         private List<Error> errors;
         private Meta meta;
+        private String uriPrefix;
 
         public ResponseBuilder() {
+            this.uriPrefix = "";
             this.meta = new Meta(
                 new Api(DEFAULT_API_VERSION),
                 new Meta.Page(DEFAULT_MAX_PAGE_SIZE, -1, null, null)
             );
+        }
+
+        public ResponseBuilder<T, V> uri(final @NonNull String uriPrefix) {
+            uri(uriPrefix, null);
+
+            return this;
+        }
+
+        public ResponseBuilder<T, V> uri(final @NonNull String uriPrefix, final String... uriArgs) {
+            final StringBuilder buffer = new StringBuilder(uriPrefix);
+
+            if (uriArgs != null
+                    && uriArgs.length > 0) {
+                replaceUriPlaceholders(buffer, uriPrefix, uriArgs);
+            }
+            this.uriPrefix = buffer.toString();
+
+            return this;
+        }
+
+        private void replaceUriPlaceholders(final @NonNull StringBuilder buffer,
+                                            final @NonNull String uriPrefix,
+                                            final String... uriArgs) {
+            buffer.setLength(0);
+
+            boolean isStartBracketFound = false;
+            int numPlaceholders = 0;
+            int position = 0;
+
+            for (char symbol : uriPrefix.toCharArray()) {
+                if (symbol != '{'
+                        && symbol != '$'
+                        && ! isStartBracketFound) {
+                    buffer.append(symbol);
+                } else if (symbol == '{' || symbol == '$') {
+                    isStartBracketFound = true;
+                } else if (isStartBracketFound && symbol == '}') {
+                    if (position < uriArgs.length) {
+                        buffer.append(uriArgs[position++]);
+                    }
+                    isStartBracketFound = false;
+
+                    ++numPlaceholders;
+                }
+            }
+
+            if (position != numPlaceholders) {
+                throw new IllegalArgumentException(
+                    "Could not replace placeholders: " + uriArgs + " in uri: " + uriPrefix + " because number of args different!"
+                );
+            }
+        }
+
+        public ResponseBuilder<T, V> apiVersion(final @NonNull String apiVersion) {
+            this.meta.getApi().setVersion(apiVersion);
+
+            return this;
         }
 
         /**
@@ -91,9 +150,9 @@ public class Response<T> {
             extractDataType(data);
 
             if (data instanceof Collection) {
-                this.dataList = collectionToJsonApiData((Collection<V>)data);
+                this.dataList = toJsonApiData((Collection<V>)data);
             } else {
-                this.dataObject = new Data<>(dataType, getJsonApiIdFieldValue(data), (V)data);
+                this.dataObject = toJsonApiData((V)data);
             }
             return this;
         }
@@ -127,17 +186,29 @@ public class Response<T> {
                 );
             }
             dataType = jsonApiTypeAnnotation.value();
+
+            if (!uriPrefix.endsWith("/" + dataType)) {
+                uriPrefix += "/" + dataType;
+            }
         }
 
-        private List<Data<V>> collectionToJsonApiData(final Collection<V> data) {
+        private List<Data<V>> toJsonApiData(final Collection<V> data) {
             final List<Data<V>> datas = new ArrayList<>();
 
             for (final V object : data) {
-                datas.add(
-                    new Data<>(dataType, getJsonApiIdFieldValue(object), object)
-                );
+                datas.add(toJsonApiData(object));
             }
             return datas;
+        }
+
+        private Data<V> toJsonApiData(final V data) {
+            final String dataId = getJsonApiIdFieldValue(data);
+
+            return new Data<>(dataType, dataId, data, buildDataLink(dataId));
+        }
+
+        private Data.Link buildDataLink(final @NonNull String dataId) {
+            return new Data.Link(this.uriPrefix + "/" + dataId, null);
         }
 
         private String getJsonApiIdFieldValue(final Object object) {
