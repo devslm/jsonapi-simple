@@ -102,6 +102,7 @@ we must add all placeholder values in the same order as in the uri. Supported pl
   - {someId}
   - ${some_id}
   - ${someId}
+
 ```java
 @RestController
 @RequestMapping(value = "/api/v1/books/{book_id}/users/${userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
