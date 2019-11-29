@@ -1,6 +1,6 @@
 ## Overview
 Simple implementation of the [JSON:API](https://jsonapi.org) specification (only required output fields).
-This library implements only top-level fields: **data**, **errors** and **meta** without any **relationships**, **includes**
+This library implements only top-level fields: **data**, **links**, **errors** and **meta** without any **relationships**, **includes**
 and others. 
 
 Often we only need standard of output all our endpoints especially when using many types of communications like HTTP query,
@@ -70,6 +70,64 @@ Parametrized response may be 2 types:
         }
     }
     ```
+
+You can add **URI** prefix for self links, by default using prefix only from **@JsonApiType** annotation
+for example:
+```java
+@RestController
+@RequestMapping(value = "/api/v1/app", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class RestController {
+    @GetMapping
+    public Response<SomeDto> responseAsObject() {
+        return Response.<SomeDto, SomeDto>builder()
+            .uri("/api/v1/app")
+            .build();
+    }
+}
+```
+This produces self links like (data fields are omitted):
+```json
+{
+  "data": { 
+    "links": {
+      "self": "/api/v1/app/test-object/7a543e90-2961-480e-b1c4-51249bf0c566"
+    }
+  },
+  "meta": {}
+}
+```
+We can also use spring placeholders in the uri the same with the **@RequestMapping** value. In this case
+we must add all placeholder values in the same order as in the uri. Supported placeholders format:
+  - {some_id}
+  - {someId}
+  - ${some_id}
+  - ${someId}
+```java
+@RestController
+@RequestMapping(value = "/api/v1/books/{book_id}/users/${userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class RestController {
+    @GetMapping
+    public Response<SomeDto> responseAsObject() {
+        final int bookId = 1024;
+        final int userId = 2048;
+ 
+        return Response.<SomeDto, SomeDto>builder()
+            .uri("/api/v1/books/{book_id}/users/${userId}", bookId, userId)
+            .build();
+    }
+}
+```
+This produces self links like (data fields are omitted):
+```json
+{
+  "data": { 
+    "links": {
+      "self": "/api/v1/books/1024/users/2048/test-object/7a543e90-2961-480e-b1c4-51249bf0c566"
+    }
+  },
+  "meta": {}
+}
+```
 
 If you want to use request filters with annotation ```@RequestJsonApiFilter``` add argument resolver in your configuration 
 for example:
@@ -141,6 +199,9 @@ public class Test {
       "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
       "name":"Test string",
       "createDate":"2019-10-08T18:46:53.40297"
+    }, 
+    "links": {
+      "self": "/test-object/7a543e90-2961-480e-b1c4-51249bf0c566"
     }
   },
   "meta": {
@@ -196,6 +257,9 @@ public class Test {
         "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
         "name":"Test string 1",
         "createDate":"2019-10-08T18:46:53"
+      }, 
+      "links": {
+        "self": "/test-object/7a543e90-2961-480e-b1c4-51249bf0c566"
       }
     },
     {
@@ -205,6 +269,9 @@ public class Test {
         "id":"b4070518-e9fc-11e9-81b4-2a2ae2dbcce4",
         "name":"Test string 2",
         "createDate":"2019-10-08T18:46:51"
+      }, 
+      "links": {
+        "self": "/test-object/b4070518-e9fc-11e9-81b4-2a2ae2dbcce4"
       }
     }
   ],
