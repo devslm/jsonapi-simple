@@ -143,7 +143,21 @@ public class ApplicationConfig implements WebMvcConfigurer {
 }
 ```
 
-Then you can use annotation ```@RequestJsonApiFilter``` in controllers for example:
+Then you can use annotation ```@RequestJsonApiFilter``` in controllers with one of the filtering operators:
+  - in
+  - not_in
+  - eq
+  - ne
+  - gt
+  - gte
+  - lt
+  - lte
+  - contain
+  - not_contain
+
+**If filter operator omitted ```eq``` will be used by default!** 
+
+For example:
 ```java
 @Slf4j
 @RestController
@@ -162,7 +176,7 @@ public class RestController {
     }
 }
 ```
-Now if request will be contain fields like ```filter[key1]=value1,value2&filter[key2]=value1``` we can get them in the
+Now if request will be contain fields like ```filter[key1][in]=value1,value2&filter[key2]=value1``` we can get them in the
 ```Filter``` object.
 
 ### Other response examples

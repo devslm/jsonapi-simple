@@ -41,6 +41,7 @@
 		<sprinfox.version>2.9.2</sprinfox.version>
 		<junit.version>5.5.2</junit.version>
 		<hamcrest.version>2.1</hamcrest.version>
+		<mockito.version>3.1.0</mockito.version>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.surefire.version>2.22.2</maven.surefire.version>
 		<maven.deploy.version>2.8.2</maven.deploy.version>
@@ -92,6 +93,13 @@
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest</artifactId>
 			<version>${hamcrest.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

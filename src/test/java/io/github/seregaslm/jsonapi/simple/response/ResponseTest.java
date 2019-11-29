@@ -15,7 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-public class ResponseTests {
+public class ResponseTest {
 	private static final String TEST_RESPONSE_URI = "/api/v1";
 	private static final UUID TEST_DTO_1_ID = UUID.randomUUID();
 	private static final String TEST_DTO_1_NAME = "TEST-1";
