@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public class Response<T> {
         /**
          * Set uri prefix for any generated links i.e. self, related etc.
          *
-         * We can use spring placeholders the same as in the {@link @RequestMapping} annotations:
+         * We can use spring placeholders the same as in the {@link RequestMapping} annotations:
          * <pre>
          *     /api/v1
          *     /api/v1/users/${userId}
