@@ -16,7 +16,7 @@ Add dependency to your project:
 <dependency>
     <groupId>io.github.seregaslm</groupId>
     <artifactId>jsonapi-simple</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
