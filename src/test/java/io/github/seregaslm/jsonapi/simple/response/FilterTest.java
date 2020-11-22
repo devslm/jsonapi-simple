@@ -22,6 +22,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 
 public class FilterTest {
+    private static final String REQUEST_FILTER_ARGUMENT_NAME = "filter";
+
     private static final String TEST_FILTER_KEY = "name";
     private static final String TEST_FILTER_KEY_2 = "key-2";
     private static final String[] TEST_FILTER_ONE_VALUE = new String[] {"abc"};
@@ -38,12 +40,12 @@ public class FilterTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         Mockito.when(methodParameter.getParameterAnnotation(any()))
             .thenReturn(requestJsonApiFilter);
         Mockito.when(requestJsonApiFilter.name())
-            .thenReturn("filter");
+            .thenReturn(REQUEST_FILTER_ARGUMENT_NAME);
 
         jsonApiFilterArgumentResolver = new JsonApiFilterArgumentResolver();
     }
@@ -109,8 +111,16 @@ public class FilterTest {
     @Test
     public void shouldParseFilterWith2Keys() {
         final Map<String, String[]> filterParams = new HashMap<>();
-        filterParams.put("filter[" + TEST_FILTER_KEY + "][" + Filter.FilterItem.Operator.IN.name().toLowerCase() + "]", TEST_FILTER_LIST_VALUE);
-        filterParams.put("filter[" + TEST_FILTER_KEY_2 + "][" + Filter.FilterItem.Operator.EQ.name().toLowerCase() + "]", TEST_FILTER_ONE_VALUE);
+        filterParams.put(
+            REQUEST_FILTER_ARGUMENT_NAME + "[" + TEST_FILTER_KEY + "]" +
+                "[" + Filter.FilterItem.Operator.IN.name().toLowerCase() + "]",
+            TEST_FILTER_LIST_VALUE
+        );
+        filterParams.put(
+            REQUEST_FILTER_ARGUMENT_NAME + "[" + TEST_FILTER_KEY_2 + "]" +
+                "[" + Filter.FilterItem.Operator.EQ.name().toLowerCase() + "]",
+            TEST_FILTER_ONE_VALUE
+        );
 
         Mockito.when(nativeWebRequest.getParameterMap())
             .thenReturn(filterParams);
@@ -130,7 +140,7 @@ public class FilterTest {
                                                final @NonNull Filter.FilterItem.Operator operator,
                                                final @NonNull String[] value) {
         final Map<String, String[]> filterParams = new HashMap<>();
-        filterParams.put("filter[" + key + "][" + operator.name().toLowerCase() + "]", value);
+        filterParams.put(REQUEST_FILTER_ARGUMENT_NAME + "[" + key + "][" + operator.name().toLowerCase() + "]", value);
 
         Mockito.when(nativeWebRequest.getParameterMap())
             .thenReturn(filterParams);

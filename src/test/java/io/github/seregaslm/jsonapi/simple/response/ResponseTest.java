@@ -1,5 +1,6 @@
 package io.github.seregaslm.jsonapi.simple.response;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,6 +26,8 @@ public class ResponseTest {
 	private static final String TEST_DTO_2_NAME = "TEST-2";
 	private static final LocalDateTime TEST_DTO_2_DATE_CREATE = LocalDateTime.now(ZoneOffset.UTC);
 	private static final String ERROR_DESCRIPTION = "TEST";
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Test
 	public void shouldReturnResponseWithDataAs1ObjectWithoutErrorsAndUriSpecified() {
@@ -45,6 +49,8 @@ public class ResponseTest {
 		assertThat(response.getMeta().getApi().getVersion(), is("1"));
 		assertThat(response.getMeta().getPage().getMaxSize(), is(25));
 		assertThat(response.getMeta().getPage().getTotal(), is(1L));
+
+		assertThatAttributesIdFieldIsAbsentInObject(response);
 	}
 
 	@Test
@@ -77,6 +83,8 @@ public class ResponseTest {
 		assertThat(response.getMeta().getApi().getVersion(), is("1"));
 		assertThat(response.getMeta().getPage().getMaxSize(), is(25));
 		assertThat(response.getMeta().getPage().getTotal(), is(2L));
+
+		assertThatAttributesIdFieldIsAbsentInCollection(response);
 	}
 
 	@Test
@@ -99,6 +107,8 @@ public class ResponseTest {
 		assertThat(response.getMeta().getApi().getVersion(), is("1"));
 		assertThat(response.getMeta().getPage().getMaxSize(), is(25));
 		assertThat(response.getMeta().getPage().getTotal(), is(1L));
+
+		assertThatAttributesIdFieldIsAbsentInObject(response);
 	}
 
 	@Test
@@ -124,6 +134,8 @@ public class ResponseTest {
 		assertThat(response.getMeta().getApi().getVersion(), is("1"));
 		assertThat(response.getMeta().getPage().getMaxSize(), is(25));
 		assertThat(response.getMeta().getPage().getTotal(), is(1L));
+
+		assertThatAttributesIdFieldIsAbsentInObject(response);
 	}
 
 
@@ -227,5 +239,30 @@ public class ResponseTest {
 		assertThat(response.getMeta().getApi().getVersion(), is("1"));
 		assertThat(response.getMeta().getPage().getMaxSize(), is(25));
 		assertThat(response.getMeta().getPage().getTotal(), is(0L));
+	}
+
+	@SuppressWarnings("unchecked")
+	private void assertThatAttributesIdFieldIsAbsentInCollection(final @NonNull Response<List<Data<TestDto>>> response) {
+		final Map<String, Object> responseMap = objectMapper.convertValue(response, Map.class);
+
+		((List<Object>)responseMap.get("data")).forEach(dataItem -> {
+			final Object idAttributeField = ((Map<String, Object>)((Map<String, Object>)dataItem)
+				.get("attributes"))
+				.get("id");
+
+			assertThat(idAttributeField, nullValue());
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	private void assertThatAttributesIdFieldIsAbsentInObject(final @NonNull Response<Data<TestDto>> response) {
+		final Map<String, Object> responseMap = objectMapper.convertValue(response, Map.class);
+
+		final Object idAttributeField = ((Map<String, Object>)((Map<String, Object>)responseMap
+			.get("data"))
+			.get("attributes"))
+			.get("id");
+
+		assertThat(idAttributeField, nullValue());
 	}
 }

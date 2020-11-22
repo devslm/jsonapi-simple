@@ -83,7 +83,7 @@ public class JsonApiFilterArgumentResolver implements HandlerMethodArgumentResol
                         && !value.startsWith("[{")) {
                     return (Arrays.asList(value.split(",")));
                 }
-                return Arrays.asList(value);
+                return Collections.singletonList(value);
             }).forEach(valueItems::addAll);
 
         return valueItems;

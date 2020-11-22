@@ -65,11 +65,12 @@ public class Response<T> {
         private static final String DEFAULT_API_VERSION = "1";
         private static final int DEFAULT_MAX_PAGE_SIZE = 25;
 
+        private final Meta meta;
+
         private Data<V> dataObject;
         private List<Data<V>> dataList;
         private String dataType;
         private List<Error> errors;
-        private Meta meta;
         private String uriPrefix;
 
         public ResponseBuilder() {
@@ -88,7 +89,7 @@ public class Response<T> {
          * @return self link
          */
         public ResponseBuilder<T, V> uri(final @NonNull String uriPrefix) {
-            uri(uriPrefix, null);
+            uri(uriPrefix, (String)null);
 
             return this;
         }

@@ -17,7 +17,7 @@ public class Filter {
         FilterItem.Operator.NOT_IN
     );
 
-    private Map<String, FilterItem> requestParams;
+    private final Map<String, FilterItem> requestParams;
 
     public Filter() {
         this.requestParams = new HashMap<>();
@@ -65,7 +65,7 @@ public class Filter {
     }
 
     public static Filter.FilterItem.FilterItemBuilder in(final @NonNull String value) {
-        return createFilterItemBuilder(FilterItem.Operator.IN, Arrays.asList(value));
+        return createFilterItemBuilder(FilterItem.Operator.IN, Collections.singletonList(value));
     }
 
     public static Filter.FilterItem.FilterItemBuilder notIn(final @NonNull List<?> values) {
@@ -73,7 +73,7 @@ public class Filter {
     }
 
     public static Filter.FilterItem.FilterItemBuilder notIn(final @NonNull String value) {
-        return createFilterItemBuilder(FilterItem.Operator.NOT_IN, Arrays.asList(value));
+        return createFilterItemBuilder(FilterItem.Operator.NOT_IN, Collections.singletonList(value));
     }
 
     public static Filter.FilterItem.FilterItemBuilder eq(final @NonNull Object value) {
@@ -121,7 +121,7 @@ public class Filter {
                                                  final @NonNull Object value) {
         if (!OPERATORS_REQUIRED_ARRAY_VALUES.contains(operator)
                 && value instanceof Collection
-                && ((Collection) value).size() > 1) {
+                && ((Collection<?>) value).size() > 1) {
             throw new IllegalArgumentException("Could not prepare filter! For operator: " + operator + " array values not permitted!");
         }
     }
@@ -129,10 +129,11 @@ public class Filter {
     @Getter
     @Builder
     @ToString
+    @EqualsAndHashCode
     public static class FilterItem {
-        private String field;
-        private Object value;
-        private Operator operator;
+        private final String field;
+        private final Object value;
+        private final Operator operator;
 
         public enum Operator {
             IN,

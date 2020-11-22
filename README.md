@@ -16,9 +16,13 @@ Add dependency to your project:
 <dependency>
     <groupId>io.github.seregaslm</groupId>
     <artifactId>jsonapi-simple</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 ```
+
+### Build Response
+
+See documentation part: [response structure](https://jsonapi.org/format/#document-structure)
 
 Each response DTO should contain the annotation ```@JsonApiType("resource-type")``` with any resource type identifier and
 the annotation ```@JsonApiId``` without arguments on field which will be unique identifier this item, usually this 
@@ -31,13 +35,13 @@ public class RestController {
     // The simplest option without SWAGGER support
     public Response responseWithoutGenerics() {
         return Response.builder()
-                   .build();
+           .build();
     }
   
     // This option will display correctly in SWAGGER with all DTO fields 
     public Response<SomeDto> responseWithGenerics() {
         return Response.<SomeDto, SomeDto>builder()
-                   .build();
+           .build();
     }
 }
 ```
@@ -48,7 +52,7 @@ Parametrized response may be 2 types:
     public class RestController {
         public Response<List<Data<SomeDto>>> responseAsList() {
             return Response.<List<Data<SomeDto>>, SomeDto>builder()
-                       .build();
+               .build();
         }
     }
     ```
@@ -57,7 +61,7 @@ Parametrized response may be 2 types:
     public class RestController {
         public Response<SomeDto> responseAsObject() {
             return Response.<SomeDto, SomeDto>builder()
-                       .build();
+               .build();
         }
     }
     ```
@@ -66,7 +70,7 @@ Parametrized response may be 2 types:
     public class RestController {
         public Response<Void> responseAsObject() {
             return Response.<Void, Void>builder()
-                       .build();
+               .build();
         }
     }
     ```
@@ -130,6 +134,10 @@ This produces self links like (data fields are omitted):
 }
 ```
 
+### Filtering
+
+See documentation part: [fetching-filtering](https://jsonapi.org/format/#fetching-filtering)
+
 If you want to use request filters with annotation ```@RequestJsonApiFilter``` add argument resolver in your configuration 
 for example:
 ```java
@@ -177,8 +185,61 @@ public class RestController {
     }
 }
 ```
-Now if request will be contain fields like ```filter[key1][in]=value1,value2&filter[key2]=value1``` we can get them in the
-```Filter``` object.
+Now if request will be contained fields like ```filter[key1][in]=value1,value2&filter[key2]=value1``` we can get them in 
+the ```Filter``` object.
+
+### Sparse fieldsets
+
+See documentation part: [fetching-sparse-fieldsets](https://jsonapi.org/format/#fetching-sparse-fieldsets)
+
+If you want to use request sparse fieldsets with annotation ```@RequestJsonApiFieldSet``` add argument resolver in your 
+configuration for example:
+```java
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ApplicationConfig implements WebMvcConfigurer {
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(new JsonApiSpreadFieldSetArgumentResolver());
+    }
+}
+```
+
+Then you can use annotation ```@RequestJsonApiFieldSet``` in controllers.
+
+For example:
+```java
+@Slf4j
+@RestController
+@AllArgsConstructor
+@RequestMapping(value = "/app", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class RestController {
+    @GetMapping
+    public Response<Void> get(final @RequestJsonApiFieldSet FieldSet fieldSet) throws Exception {
+        if (fieldSet.hasResource("resource-type")) {
+            final Set<String> resourceFields = fieldSet.getFieldsByResourceType("resource-type");
+
+            // do something with resource fields
+        }
+
+        if (fieldSet.isEmpty()) {
+            // do something with empty resource fields
+            // there we can add for example any default fields
+            fieldSet.addFields("resource-type", Set.of("default_field"));
+        }
+
+        if (!fieldSet.containsFields(Set.of("required_field_1", "required_field_2"))) {
+            // do something when required fields in resource fields
+            // are absent
+        }
+        return Response.<Void, Void>builder()
+           .build();
+    }
+}
+```
+Now if request will be contained fields like ```fields[resource-type-1]=field_1,field_2&fields[resource-type-2]=field_3```
+we can get them in the ```FieldSet``` object.
 
 ### Other response examples
 Example response with one data object:
@@ -192,13 +253,13 @@ public static class TestDto {
     private LocalDateTime createDate;
 }
 
-public class Test {
+public class io.github.seregaslm.jsonapi.simple.Test {
     public Response<TestDto> main() {
         return Response.<TestDto, TestDto>builder()
             .data(
                 TestDto.builder()
                     .id(UUID.randomUUID())
-                    .name("Test string")
+                    .name("io.github.seregaslm.jsonapi.simple.Test string")
                     .createDate(LocalDateTime.now(ZoneOffset.UTC))
                     .build()
             ).build();
@@ -211,8 +272,7 @@ public class Test {
     "type":"test-object",
     "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
     "attributes": {
-      "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
-      "name":"Test string",
+      "name":"io.github.seregaslm.jsonapi.simple.Test string",
       "createDate":"2019-10-08T18:46:53.40297"
     }, 
     "links": {
@@ -242,19 +302,19 @@ public static class TestDto {
     private LocalDateTime createDate;
 }
 
-public class Test {
+public class io.github.seregaslm.jsonapi.simple.Test {
     public Response<List<Data<TestDto>>> main() {
         return Response.<List<Data<TestDto>>, TestDto>builder()
             .data(
                 Arrays.asList(
                     TestDto.builder()
                         .id(UUID.randomUUID())
-                        .name("Test string 1")
+                        .name("io.github.seregaslm.jsonapi.simple.Test string 1")
                         .createDate(LocalDateTime.now(ZoneOffset.UTC))
                         .build(),
                     TestDto.builder()
                         .id(UUID.randomUUID())
-                        .name("Test string 2")
+                        .name("io.github.seregaslm.jsonapi.simple.Test string 2")
                         .createDate(LocalDateTime.now(ZoneOffset.UTC))
                         .build()
                 )
@@ -269,8 +329,7 @@ public class Test {
       "type":"test-object",
       "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
       "attributes": {
-        "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
-        "name":"Test string 1",
+        "name":"io.github.seregaslm.jsonapi.simple.Test string 1",
         "createDate":"2019-10-08T18:46:53"
       }, 
       "links": {
@@ -279,10 +338,9 @@ public class Test {
     },
     {
       "type":"test-object",
-      "id":"b4070518-e9fc-11e9-81b4-2a2ae2dbcce4",
       "attributes": {
         "id":"b4070518-e9fc-11e9-81b4-2a2ae2dbcce4",
-        "name":"Test string 2",
+        "name":"io.github.seregaslm.jsonapi.simple.Test string 2",
         "createDate":"2019-10-08T18:46:51"
       }, 
       "links": {
@@ -305,7 +363,7 @@ public class Test {
 Example response with error (data is empty so we use ```Void``` class as generic parameter):
 ```java
 // Pseudo code
-public class Test {
+public class io.github.seregaslm.jsonapi.simple.Test {
     public Response<Void> main() {
         return Response.<Void, Void>builder()
             .error(
@@ -341,7 +399,7 @@ Example response with validation error and field name with invalid data (data is
 class as generic parameter):
 ```java
 // Pseudo code
-public class Test {
+public class io.github.seregaslm.jsonapi.simple.Test {
     public Response<Void> main() {
         return Response.<Void, Void>builder()
             .validationError("field-name", "Field must be greater 0!")
