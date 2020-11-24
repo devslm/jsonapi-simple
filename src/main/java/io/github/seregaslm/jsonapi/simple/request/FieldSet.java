@@ -78,6 +78,8 @@ public class FieldSet {
     /**
      * Check if resource type contains required field.
      *
+     * @param resourceType resource type
+     * @param requiredField field that should be in fields request
      * @return true if contains and false otherwise
      */
     public boolean containsField(final @NonNull String resourceType, final @NonNull String requiredField) {
@@ -87,6 +89,8 @@ public class FieldSet {
     /**
      * Check if resource type contains required fields set.
      *
+     * @param resourceType resource type
+     * @param requiredFields fields that should be in fields request
      * @return true if contains and false otherwise
      */
     public boolean containsFields(final @NonNull String resourceType, final @NonNull Set<String> requiredFields) {
