@@ -8,7 +8,7 @@ websockets, queues etc and don't need complex entities inner relationships in ou
 exists standards so this library for this goals.
 
 ## Docs
-[See project page](https://seregaslm.github.io/jsonapi-simple/)
+[See project page](https://devslm.github.io/jsonapi-simple/)
 
 ## Usage
 Add dependency to your project:
