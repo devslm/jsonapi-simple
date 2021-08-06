@@ -253,13 +253,13 @@ public static class TestDto {
     private LocalDateTime createDate;
 }
 
-public class io.github.seregaslm.jsonapi.simple.Test {
+public class Test {
     public Response<TestDto> main() {
         return Response.<TestDto, TestDto>builder()
             .data(
                 TestDto.builder()
                     .id(UUID.randomUUID())
-                    .name("io.github.seregaslm.jsonapi.simple.Test string")
+                    .name("Test string")
                     .createDate(LocalDateTime.now(ZoneOffset.UTC))
                     .build()
             ).build();
@@ -272,7 +272,7 @@ public class io.github.seregaslm.jsonapi.simple.Test {
     "type":"test-object",
     "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
     "attributes": {
-      "name":"io.github.seregaslm.jsonapi.simple.Test string",
+      "name":"Test string",
       "createDate":"2019-10-08T18:46:53.40297"
     }, 
     "links": {
@@ -302,19 +302,19 @@ public static class TestDto {
     private LocalDateTime createDate;
 }
 
-public class io.github.seregaslm.jsonapi.simple.Test {
+public class Test {
     public Response<List<Data<TestDto>>> main() {
         return Response.<List<Data<TestDto>>, TestDto>builder()
             .data(
                 Arrays.asList(
                     TestDto.builder()
                         .id(UUID.randomUUID())
-                        .name("io.github.seregaslm.jsonapi.simple.Test string 1")
+                        .name("Test string 1")
                         .createDate(LocalDateTime.now(ZoneOffset.UTC))
                         .build(),
                     TestDto.builder()
                         .id(UUID.randomUUID())
-                        .name("io.github.seregaslm.jsonapi.simple.Test string 2")
+                        .name("Test string 2")
                         .createDate(LocalDateTime.now(ZoneOffset.UTC))
                         .build()
                 )
@@ -329,7 +329,7 @@ public class io.github.seregaslm.jsonapi.simple.Test {
       "type":"test-object",
       "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
       "attributes": {
-        "name":"io.github.seregaslm.jsonapi.simple.Test string 1",
+        "name":"Test string 1",
         "createDate":"2019-10-08T18:46:53"
       }, 
       "links": {
@@ -340,7 +340,7 @@ public class io.github.seregaslm.jsonapi.simple.Test {
       "type":"test-object",
       "attributes": {
         "id":"b4070518-e9fc-11e9-81b4-2a2ae2dbcce4",
-        "name":"io.github.seregaslm.jsonapi.simple.Test string 2",
+        "name":"Test string 2",
         "createDate":"2019-10-08T18:46:51"
       }, 
       "links": {
@@ -363,7 +363,7 @@ public class io.github.seregaslm.jsonapi.simple.Test {
 Example response with error (data is empty so we use ```Void``` class as generic parameter):
 ```java
 // Pseudo code
-public class io.github.seregaslm.jsonapi.simple.Test {
+public class Test {
     public Response<Void> main() {
         return Response.<Void, Void>builder()
             .error(
@@ -399,7 +399,7 @@ Example response with validation error and field name with invalid data (data is
 class as generic parameter):
 ```java
 // Pseudo code
-public class io.github.seregaslm.jsonapi.simple.Test {
+public class Test {
     public Response<Void> main() {
         return Response.<Void, Void>builder()
             .validationError("field-name", "Field must be greater 0!")
