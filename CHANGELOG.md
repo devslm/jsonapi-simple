@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0] - 2021-08-27
+### Changed:
+- Maven groupId now com.slm-dev
+- Update all dependencies versions
+- Update README file
+
 ## [1.2.0] - 2020-11-22
 ### Added:
   - Sparse fieldsets support 

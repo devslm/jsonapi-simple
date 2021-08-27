@@ -14,9 +14,9 @@ exists standards so this library for this goals.
 Add dependency to your project:
 ```xml
 <dependency>
-    <groupId>io.github.seregaslm</groupId>
+    <groupId>com.slm-dev</groupId>
     <artifactId>jsonapi-simple</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
