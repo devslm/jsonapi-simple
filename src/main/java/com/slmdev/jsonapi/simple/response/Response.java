@@ -316,7 +316,7 @@ public class Response<T> {
          * result object will contain all errors we passed.
          *
          * @param status spring {@link HttpStatus} object
-         * @param code internal SMM error code (if exists)
+         * @param code internal error code (if exists)
          * @param detail detail information about error
          * @param errorValidationField field with failed validation
          * @return self link
