@@ -23,6 +23,10 @@ public class Filter {
         this.requestParams = new HashMap<>();
     }
 
+    public Set<String> getAllKeys() {
+        return requestParams.keySet();
+    }
+
     /**
      * Check if filter parameter exists.
      *
@@ -31,6 +35,17 @@ public class Filter {
      */
     public boolean hasParam(final @NonNull String name) {
         return requestParams.containsKey(name);
+    }
+
+    /**
+     * Get all filter parameters.
+     *
+     * <p>Value always is a list of strings.
+     *
+     * @return list of all param values
+     */
+    public List<FilterItem> getAllParams() {
+        return new ArrayList<>(requestParams.values());
     }
 
     /**

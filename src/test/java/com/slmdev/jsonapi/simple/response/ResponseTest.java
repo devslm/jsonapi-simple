@@ -1,6 +1,8 @@
 package com.slmdev.jsonapi.simple.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.NonNull;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
@@ -26,9 +28,12 @@ public class ResponseTest {
 	private static final UUID TEST_DTO_2_ID = UUID.randomUUID();
 	private static final String TEST_DTO_2_NAME = "TEST-2";
 	private static final LocalDateTime TEST_DTO_2_DATE_CREATE = LocalDateTime.now(ZoneOffset.UTC);
+	private static final String ERROR_CODE = "TEST_ERROR_CODE";
 	private static final String ERROR_DESCRIPTION = "TEST";
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = JsonMapper.builder()
+		.addModule(new JavaTimeModule())
+		.build();
 
 	@Test
 	public void shouldReturnResponseWithDataAs1ObjectWithoutErrorsAndUriSpecified() {
@@ -153,7 +158,7 @@ public class ResponseTest {
 	}
 
 	@Test
-	public void shouldReturnResponseWithErrorWithoutDataIfDataObjectPassed() {
+	public void shouldReturnResponseWithErrorWithData() {
 		final Response<Data<TestDto>> response = Response.<Data<TestDto>, TestDto>builder()
 			.data(buildTestDto1())
 			.error(HttpStatus.BAD_REQUEST, ERROR_DESCRIPTION)
@@ -163,7 +168,7 @@ public class ResponseTest {
 	}
 
 	@Test
-	public void shouldReturnResponseWithErrorWithoutDataIfDataObjectAbsent() {
+	public void shouldReturnResponseWithErrorWithEmptyData() {
 		final Response<Data<TestDto>> response = Response.<Data<TestDto>, TestDto>builder()
 			.error(HttpStatus.BAD_REQUEST, ERROR_DESCRIPTION)
 			.build();
@@ -172,7 +177,28 @@ public class ResponseTest {
 	}
 
 	@Test
-	public void shouldReturnResponseWithValidationErrorWithoutDataIfDataObjectPassed() {
+	public void shouldReturnResponseWithErrorCodeWithEmptyData() {
+		final Response<Data<TestDto>> response = Response.<Data<TestDto>, TestDto>builder()
+			.error(HttpStatus.BAD_REQUEST, ERROR_CODE, ERROR_DESCRIPTION)
+			.build();
+
+		assertErrorResponse(response);
+		assertResponseErrorCode(response);
+	}
+
+	@Test
+	public void shouldReturnResponseWithErrorCodeWithData() {
+		final Response<Data<TestDto>> response = Response.<Data<TestDto>, TestDto>builder()
+			.data(buildTestDto1())
+			.error(HttpStatus.BAD_REQUEST, ERROR_CODE, ERROR_DESCRIPTION)
+			.build();
+
+		assertErrorResponse(response);
+		assertResponseErrorCode(response);
+	}
+
+	@Test
+	public void shouldReturnResponseWithValidationErrorWithData() {
 		final Response<Void> response = Response.<Void, Void>builder()
 			.data(buildTestDto1())
 			.validationError("someField", ERROR_DESCRIPTION)
@@ -185,7 +211,7 @@ public class ResponseTest {
 	}
 
 	@Test
-	public void shouldReturnResponseWithValidationErrorWhenEmptyData() {
+	public void shouldReturnResponseWithValidationErrorWithEmptyData() {
 		final Response<Void> response = Response.<Void, Void>builder()
 			.validationError("someField", ERROR_DESCRIPTION)
 			.build();
@@ -229,6 +255,10 @@ public class ResponseTest {
 
 	private String buildSelfLink(final @NonNull String uri, final @NonNull TestDto testDto) {
 		return uri + "/" + TestDto.API_TYPE + "/" + testDto.getId();
+	}
+
+	private void assertResponseErrorCode(final @NonNull Response<?> response) {
+		assertThat(response.getErrors().get(0).getCode(), is(ERROR_CODE));
 	}
 
 	private void assertErrorResponse(final @NonNull Response<?> response) {

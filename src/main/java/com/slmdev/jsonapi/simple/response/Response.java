@@ -310,6 +310,18 @@ public class Response<T> {
         }
 
         /**
+         * @see ResponseBuilder#error(HttpStatus, String, String, String)
+         *
+         * @param status spring {@link HttpStatus} object
+         * @param code internal error code (if exists)
+         * @param detail detail information about error
+         * @return self link
+         */
+        public ResponseBuilder<T, V> error(final HttpStatus status, final String code, final String detail) {
+            return error(status, code, detail, null);
+        }
+
+        /**
          * Create errors object.
          *
          * <p>We can invoke this method as many times as we need and

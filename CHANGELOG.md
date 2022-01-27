@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.4.0] - 2022-01-27
+### Changed:
+- Update all dependencies versions
+- Add methods to get all filter keys and values
+
 ## [1.3.0] - 2021-08-27
 ### Changed:
 - Maven groupId now com.slm-dev

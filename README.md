@@ -16,7 +16,7 @@ Add dependency to your project:
 <dependency>
     <groupId>com.slm-dev</groupId>
     <artifactId>jsonapi-simple</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 

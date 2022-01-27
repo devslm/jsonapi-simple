@@ -13,9 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -93,6 +91,30 @@ public class FilterTest {
     @Test
     public void shouldParseFilterWithOperatorIn() {
         shouldParseFilterWithOperator(TEST_FILTER_KEY, Filter.FilterItem.Operator.IN, TEST_FILTER_LIST_VALUE);
+    }
+
+    @Test
+    public void shouldReturnAllFilterItemsAndKeys() {
+        final String key = TEST_FILTER_KEY;
+        final Filter.FilterItem.Operator operator = Filter.FilterItem.Operator.IN;
+        final String[] value = TEST_FILTER_LIST_VALUE;
+        final Map<String, String[]> filterParams = new HashMap<>();
+        filterParams.put(REQUEST_FILTER_ARGUMENT_NAME + "[" + key + "][" + operator.name().toLowerCase() + "]", value);
+
+        Mockito.when(nativeWebRequest.getParameterMap())
+            .thenReturn(filterParams);
+
+        final Filter filter = (Filter)jsonApiFilterArgumentResolver.resolveArgument(methodParameter, null, nativeWebRequest, null);
+        final Filter.FilterItem requiedFilterItem = Filter.FilterItem.builder()
+            .field(key)
+            .operator(operator)
+            .value(List.of(value))
+            .build();
+
+        assertThat(filter.getParam(key).getField(), is(key));
+        assertThat(filter.getParam(key).getOperator(), is(operator));
+        assertThat(filter.getAllKeys(), is(Set.of(key)));
+        assertThat(filter.getAllParams(), is(List.of(requiedFilterItem)));
     }
 
     @Test
