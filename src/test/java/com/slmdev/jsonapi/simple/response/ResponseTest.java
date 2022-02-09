@@ -235,6 +235,41 @@ public class ResponseTest {
 		assertThat(response.getMeta().getPage().getTotal(), is(0L));
 	}
 
+	@Test
+	public void shouldReturnResponseWithManuallyDataTypeAndValidInvokesOrderForMapType() {
+		final Response<Data<Map<String, String>>> response = Response.<Data<Map<String, String>>, Map<String, String>>builder()
+			.dataType("custom-data-type")
+			.data(Map.of("key", "value"))
+			.build();
+
+		assertThat(response.getData().getType(), is("custom-data-type"));
+		assertThat(response.getData().getAttributes().get("key"), is("value"));
+	}
+
+	@Test
+	public void shouldReturnResponseWithManuallyDataTypeAndValidInvokesOrderForListType() {
+		final Response<Data<Map<String, List<String>>>> response = Response.<Data<Map<String, List<String>>>, Map<String, List<String>>>builder()
+			.dataType("custom-data-type")
+			.data(Map.of("key", List.of("value")))
+			.build();
+
+		assertThat(response.getData().getType(), is("custom-data-type"));
+		assertThat(response.getData().getAttributes().get("key"), is(List.of("value")));
+	}
+
+	@Test
+	public void shouldThrowExceptionWithManuallyDataTypeAndInValidInvokesOrder() {
+		Assertions.assertThrows(
+			RuntimeException.class,
+			() -> {
+				Response.<Data<Map<String, String>>, Map<String, String>>builder()
+					.data(Map.of("key", "value"))
+					.dataType("custom-data-type")
+					.build();
+			}
+		);
+	}
+
 	private TestDto buildTestDto1() {
 		return new TestDto()
 			.setId(TEST_DTO_1_ID)

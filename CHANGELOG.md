@@ -1,15 +1,25 @@
 # Changelog
 
-## [1.4.0] - 2022-01-27
+## [1.5.0] - 2022-02-09
+### Added:
+  - Pagination support
+  - Method to set manually data type without **@JsonApyType** annotation to use different data types like maps, lists etc.
+
 ### Changed:
-- Update all dependencies versions
-- Add methods to get all filter keys and values
+  - Update mockito version 
+
+## [1.4.0] - 2022-01-27
+### Added:
+  - Methods to get all filter keys and values
+
+### Changed:
+  - Update all dependencies versions
 
 ## [1.3.0] - 2021-08-27
 ### Changed:
-- Maven groupId now com.slm-dev
-- Update all dependencies versions
-- Update README file
+  - Maven groupId now com.slm-dev
+  - Update all dependencies versions
+  - Update README file
 
 ## [1.2.0] - 2020-11-22
 ### Added:

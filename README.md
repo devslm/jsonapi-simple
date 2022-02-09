@@ -16,7 +16,7 @@ Add dependency to your project:
 <dependency>
     <groupId>com.slm-dev</groupId>
     <artifactId>jsonapi-simple</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 
@@ -27,6 +27,9 @@ See documentation part: [response structure](https://jsonapi.org/format/#documen
 Each response DTO should contain the annotation ```@JsonApiType("resource-type")``` with any resource type identifier and
 the annotation ```@JsonApiId``` without arguments on field which will be unique identifier this item, usually this 
 field is ```id```.
+
+If we want to use data types like lists, maps etc. in the response we can set manually data type to avoid exception 
+(see example below). 
 
 Each response may contain generics (if you planning to use SWAGGER) or may not (without SWAGGER), for example both 
 variants correct:
@@ -74,6 +77,47 @@ Parametrized response may be 2 types:
         }
     }
     ```
+
+Data types other than the DTO class (lists, maps etc.) can't have required annotations, so we can set data type manually:
+```java
+@RestController
+@RequestMapping(value = "/api/v1/app", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class RestController {
+    @GetMapping
+    public Response<SomeDto> responseAsObject() {
+        return Response.<SomeDto, SomeDto>builder()
+            .dataType("some-data-type")
+            .data(Map.of("name", "Test string"))
+            .build();
+    }
+}
+```
+This produces response like:
+```json
+{
+  "data": {
+    "type":"some-data-type",
+    "id":"<random-uuid-id>",
+    "attributes": {
+      "name": "Test string"
+    },
+    "links": {
+      "self": "/some-data-type/<random-uuid-id>"
+    }
+  },
+  "meta": {
+    "api": {
+      "version":"1"
+    },
+    "page": {
+      "maxSize":25,
+      "total":1
+    }
+  }
+}
+```
+#### Method **dataType** must be called before method **data**! With invalid calls order exception will be thrown!
+#### When set manually data type random response id (UUID) will be generated!
 
 You can add **URI** prefix for self links, by default using prefix only from **@JsonApiType** annotation
 for example:
@@ -240,6 +284,55 @@ public class RestController {
 ```
 Now if request will be contained fields like ```fields[resource-type-1]=field_1,field_2&fields[resource-type-2]=field_3```
 we can get them in the ```FieldSet``` object.
+
+### Pagination
+
+See documentation part: [fetching-pagination](https://jsonapi.org/format/#fetching-pagination)
+
+If you want to use request page with annotation ```@RequestJsonApiPage``` add argument resolver in your configuration 
+for example:
+```java
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ApplicationConfig implements WebMvcConfigurer {
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(new JsonApiPageArgumentResolver());
+    }
+}
+```
+
+Then you can use annotation ```@RequestJsonApiPage``` in controllers and get standard spring Pageable object.
+
+For example:
+```java
+@Slf4j
+@RestController
+@AllArgsConstructor
+@RequestMapping(value = "/app", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class RestController {
+    @GetMapping
+    public Response<Void> get(final @RequestJsonApiPage Pageable page) throws Exception {
+        return Response.<Void, Void>builder()
+            .build();
+    }
+}
+```
+
+Now if request will be contained fields like ```page[number]=3&page[size]=10``` we can get them in the ```Pageable``` object.
+
+Supported fields for the page number are:
+  - **page[number]**
+  - **page[page]**
+  
+And for the page size are:
+  - **page[size]**
+  - **page[limit]**
+  
+
+###If request page number < 1 resolver always return number = 1 and if size < 1 it always returns default value = 25!
+
 
 ### Other response examples
 Example response with one data object:

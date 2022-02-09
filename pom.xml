@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.slm-dev</groupId>
 	<artifactId>jsonapi-simple</artifactId>
-	<version>1.4.0</version>
+	<version>1.5.0</version>
 	<name>jsonapi-simple</name>
 	<description>Simple implementation of the JSON:API specification</description>
 	<url>https://slm-dev.com/jsonapi-simple/</url>
@@ -36,13 +36,14 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
 		<spring.web.version>5.3.15</spring.web.version>
+		<spring.data.commons.version>2.6.1</spring.data.commons.version>
 		<lombok.version>1.18.22</lombok.version>
 		<lombok.maven.plugin.version>1.18.20.0</lombok.maven.plugin.version>
 		<jackson.version>2.13.1</jackson.version>
 		<sprinfox.version>3.0.0</sprinfox.version>
 		<junit.version>5.8.2</junit.version>
 		<hamcrest.version>2.2</hamcrest.version>
-		<mockito.version>4.2.0</mockito.version>
+		<mockito.version>4.3.1</mockito.version>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.surefire.version>2.22.2</maven.surefire.version>
 		<maven.deploy.version>2.8.2</maven.deploy.version>
@@ -57,6 +58,12 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<version>${spring.web.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
+			<version>${spring.data.commons.version}</version>
 		</dependency>
 
 		<dependency>

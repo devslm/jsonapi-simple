@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 /**
- * Spring filter using for extract filter values from the request.
+ * Spring resolver using for extract filter values from the request.
  *
  * <p>By default using {@code filter} param name and key names in square brackets,
  * for example {@code filter[id]=123&filter[name]=test}. If filter operator omitted
@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  * After parsing will be create new {@link Filter} object with the map of found filters.
  * Each value is {@link Filter.FilterItem} object.
  *
- * <p>This filter must be registered in Spring application.
+ * <p>This resolver must be registered in Spring application.
  */
 public class JsonApiFilterArgumentResolver implements HandlerMethodArgumentResolver {
     private static final String REQUEST_FILTER_KEY_BRACKET_START = "[";

@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Rest response data type in JSON API format.
@@ -70,14 +71,17 @@ public class Response<T> {
         private Data<V> dataObject;
         private List<Data<V>> dataList;
         private String dataType;
+        private boolean isManualDataType;
         private List<Error> errors;
         private String uriPrefix;
 
         public ResponseBuilder() {
+            this.isManualDataType = false;
             this.uriPrefix = "";
             this.meta = new Meta(
                 new Api(DEFAULT_API_VERSION),
-                new Meta.Page(DEFAULT_MAX_PAGE_SIZE, -1, null, null)
+                new Meta.Page(DEFAULT_MAX_PAGE_SIZE, -1, null, null),
+                null
             );
         }
 
@@ -169,6 +173,24 @@ public class Response<T> {
         }
 
         /**
+         * Set manually data type for response.
+         *
+         * If we need to set data type manually (without {@link JsonApiType} annotation or without DTO object)
+         * this method must be called before method {@link Response#data},
+         * otherwise will be thrown exception {@link RuntimeException}!
+         *
+         * @param dataType custom data type for the response
+         * @return self link
+         */
+        public ResponseBuilder<T, V> dataType(final String dataType) {
+            if (StringUtils.hasText(dataType)) {
+                this.isManualDataType = true;
+                this.dataType = dataType;
+            }
+            return this;
+        }
+
+        /**
          * Set data for response.
          *
          * @param data data object of {@link Collection} or {@link Object} type
@@ -234,8 +256,15 @@ public class Response<T> {
         }
 
         private Data<V> toJsonApiData(final V data) {
-            final String dataId = getJsonApiIdFieldValue(data);
+            final String dataId;
 
+            if (!isManualDataType) {
+                dataId = getJsonApiIdFieldValue(data);
+            } else {
+                dataId = UUID.randomUUID().toString();
+
+                LOGGER.info("Create JSON API response random response id: {}", dataId);
+            }
             return new Data<>(dataType, dataId, data, buildDataLink(dataId));
         }
 
