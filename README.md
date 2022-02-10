@@ -16,7 +16,7 @@ Add dependency to your project:
 <dependency>
     <groupId>com.slm-dev</groupId>
     <artifactId>jsonapi-simple</artifactId>
-    <version>1.5.0</version>
+    <version>1.6.0</version>
 </dependency>
 ```
 
@@ -86,7 +86,8 @@ public class RestController {
     @GetMapping
     public Response<SomeDto> responseAsObject() {
         return Response.<SomeDto, SomeDto>builder()
-            .dataType("some-data-type")
+            .jsonApiId("some-id")
+            .jsonApiType("some-data-type")
             .data(Map.of("name", "Test string"))
             .build();
     }
@@ -97,7 +98,7 @@ This produces response like:
 {
   "data": {
     "type":"some-data-type",
-    "id":"<random-uuid-id>",
+    "id":"<random-uuid-id> or <fixed-id>",
     "attributes": {
       "name": "Test string"
     },
@@ -116,8 +117,8 @@ This produces response like:
   }
 }
 ```
-#### Method **dataType** must be called before method **data**! With invalid calls order exception will be thrown!
-#### When set manually data type random response id (UUID) will be generated!
+#### Method **jsonApiType** must be called before method **data**! With invalid calls order exception will be thrown!
+#### When set manually data type random response id (UUID) will be generated! You can set manually by method **jsonApiId**
 
 You can add **URI** prefix for self links, by default using prefix only from **@JsonApiType** annotation
 for example:

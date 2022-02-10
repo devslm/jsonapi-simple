@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.slmdev.jsonapi.simple.annotation.JsonApiId;
 import com.slmdev.jsonapi.simple.annotation.JsonApiType;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -38,6 +35,7 @@ import java.util.UUID;
 @Slf4j
 @Getter
 @ToString
+@NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -70,7 +68,9 @@ public class Response<T> {
 
         private Data<V> dataObject;
         private List<Data<V>> dataList;
-        private String dataType;
+        private String jsonApiId;
+        private String jsonApiType;
+        private boolean isManualDataId;
         private boolean isManualDataType;
         private List<Error> errors;
         private String uriPrefix;
@@ -173,19 +173,37 @@ public class Response<T> {
         }
 
         /**
-         * Set manually data type for response.
+         * Set manually json api id for response.
+         *
+         * If we need to set data id manually (without {@link JsonApiType} annotation or without DTO object)
+         * this method must be called before method {@link Response#data},
+         * otherwise will be thrown exception {@link RuntimeException}!
+         *
+         * @param id custom json api id for the response
+         * @return self link
+         */
+        public ResponseBuilder<T, V> jsonApiId(final String id) {
+            if (StringUtils.hasText(id)) {
+                this.isManualDataId = true;
+                this.jsonApiId = id;
+            }
+            return this;
+        }
+
+        /**
+         * Set manually json api data type for response.
          *
          * If we need to set data type manually (without {@link JsonApiType} annotation or without DTO object)
          * this method must be called before method {@link Response#data},
          * otherwise will be thrown exception {@link RuntimeException}!
          *
-         * @param dataType custom data type for the response
+         * @param type custom json api data type for the response
          * @return self link
          */
-        public ResponseBuilder<T, V> dataType(final String dataType) {
-            if (StringUtils.hasText(dataType)) {
+        public ResponseBuilder<T, V> jsonApiType(final String type) {
+            if (StringUtils.hasText(type)) {
                 this.isManualDataType = true;
-                this.dataType = dataType;
+                this.jsonApiType = type;
             }
             return this;
         }
@@ -203,6 +221,10 @@ public class Response<T> {
             }
             extractDataType(data);
 
+            if (!uriPrefix.endsWith("/" + jsonApiType)) {
+                uriPrefix += "/" + jsonApiType;
+            }
+
             if (data instanceof Collection) {
                 this.dataList = toJsonApiData((Collection<V>)data);
             } else {
@@ -212,7 +234,7 @@ public class Response<T> {
         }
 
         private void extractDataType(final Object object) {
-            if (StringUtils.hasText(dataType)) {
+            if (StringUtils.hasText(jsonApiType)) {
                 return;
             }
             JsonApiType jsonApiTypeAnnotation = null;
@@ -225,7 +247,7 @@ public class Response<T> {
                         .getClass()
                         .getAnnotation(JsonApiType.class);
                 } else {
-                    dataType = "";
+                    jsonApiType = "";
 
                     return;
                 }
@@ -239,11 +261,7 @@ public class Response<T> {
                         "See: https://jsonapi.org/format/#document-resource-object-identification for more information"
                 );
             }
-            dataType = jsonApiTypeAnnotation.value();
-
-            if (!uriPrefix.endsWith("/" + dataType)) {
-                uriPrefix += "/" + dataType;
-            }
+            jsonApiType = jsonApiTypeAnnotation.value();
         }
 
         private List<Data<V>> toJsonApiData(final Collection<V> data) {
@@ -261,11 +279,15 @@ public class Response<T> {
             if (!isManualDataType) {
                 dataId = getJsonApiIdFieldValue(data);
             } else {
-                dataId = UUID.randomUUID().toString();
+                if (isManualDataId) {
+                    dataId = jsonApiId;
+                } else {
+                    dataId = UUID.randomUUID().toString();
 
-                LOGGER.info("Create JSON API response random response id: {}", dataId);
+                    LOGGER.trace("Create JSON API response random response id: {}", dataId);
+                }
             }
-            return new Data<>(dataType, dataId, data, buildDataLink(dataId));
+            return new Data<>(jsonApiType, dataId, data, buildDataLink(dataId));
         }
 
         private Data.Link buildDataLink(final @NonNull String dataId) {
@@ -372,9 +394,7 @@ public class Response<T> {
             Error.Source errorSource = null;
 
             if (StringUtils.hasText(errorValidationField)) {
-                errorSource = Error.Source.builder()
-                    .parameter(errorValidationField)
-                    .build();
+                errorSource = new Error.Source(errorValidationField);
             }
             this.errors.add(
                 new Error(status.value(), code, detail, errorSource)
@@ -444,6 +464,16 @@ public class Response<T> {
          */
         public ResponseBuilder<T, V> pageNext(final String next) {
             this.meta.getPage().setNext(next);
+
+            return this;
+        }
+
+        /**
+         * @param metaWebSocket websocket specific meta information
+         * @return self link
+         */
+        public ResponseBuilder<T, V> metaWebSocket(final @NonNull Meta.WebSocket metaWebSocket) {
+            meta.setWebSocket(metaWebSocket);
 
             return this;
         }

@@ -1,9 +1,11 @@
 package com.slmdev.jsonapi.simple.response;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -238,7 +240,7 @@ public class ResponseTest {
 	@Test
 	public void shouldReturnResponseWithManuallyDataTypeAndValidInvokesOrderForMapType() {
 		final Response<Data<Map<String, String>>> response = Response.<Data<Map<String, String>>, Map<String, String>>builder()
-			.dataType("custom-data-type")
+			.jsonApiType("custom-data-type")
 			.data(Map.of("key", "value"))
 			.build();
 
@@ -249,10 +251,24 @@ public class ResponseTest {
 	@Test
 	public void shouldReturnResponseWithManuallyDataTypeAndValidInvokesOrderForListType() {
 		final Response<Data<Map<String, List<String>>>> response = Response.<Data<Map<String, List<String>>>, Map<String, List<String>>>builder()
-			.dataType("custom-data-type")
+			.jsonApiType("custom-data-type")
 			.data(Map.of("key", List.of("value")))
 			.build();
 
+		assertThat(response.getData().getType(), is("custom-data-type"));
+		assertThat(response.getData().getAttributes().get("key"), is(List.of("value")));
+	}
+
+	@Test
+	public void shouldReturnResponseWithManuallyDataTypeAndIdAndValidInvokesOrderForListType() {
+		final String id = UUID.randomUUID().toString();
+		final Response<Data<Map<String, List<String>>>> response = Response.<Data<Map<String, List<String>>>, Map<String, List<String>>>builder()
+			.jsonApiId(id)
+			.jsonApiType("custom-data-type")
+			.data(Map.of("key", List.of("value")))
+			.build();
+
+		assertThat(response.getData().getId(), is(id));
 		assertThat(response.getData().getType(), is("custom-data-type"));
 		assertThat(response.getData().getAttributes().get("key"), is(List.of("value")));
 	}
@@ -264,10 +280,120 @@ public class ResponseTest {
 			() -> {
 				Response.<Data<Map<String, String>>, Map<String, String>>builder()
 					.data(Map.of("key", "value"))
-					.dataType("custom-data-type")
+					.jsonApiType("custom-data-type")
 					.build();
 			}
 		);
+	}
+
+	@Test
+	@SneakyThrows
+	public void shouldParseJsonResponseWithListData() {
+		final String data = "{\n" +
+			"    \"data\": [\n" +
+			"        {\n" +
+			"            \"type\": \"cars\",\n" +
+			"            \"id\": \"M5\",\n" +
+			"            \"attributes\": {\n" +
+			"                \"id\": \"M5\",\n" +
+			"                \"brand\": \"BMW\"\n" +
+			"            }\n" +
+			"        },{\n" +
+			"            \"type\": \"cars\",\n" +
+			"            \"id\": \"911\",\n" +
+			"            \"attributes\": {\n" +
+			"                \"id\": \"911\",\n" +
+			"                \"brand\": \"Porshe\"\n" +
+			"            }\n" +
+			"        }\n" +
+			"    ],\n" +
+			"    \"meta\": {\n" +
+			"        \"api\": {\n" +
+			"            \"version\": \"1\"\n" +
+			"        }\n" +
+			"    }\n" +
+			"}";
+		final TypeReference<Response<List<Data<TestCarDto>>>> type = new TypeReference<>() {};
+		final Response<List<Data<TestCarDto>>> response = new ObjectMapper().readValue(data, type);
+
+		assertThat(response.getErrors(), nullValue());
+		assertThat(response.getData().size(), is(2));
+
+		assertThat(response.getData().get(0).getType(), is("cars"));
+		assertThat(response.getData().get(0).getId(), is("M5"));
+		assertThat(response.getData().get(0).getAttributes().getId(), nullValue());
+		assertThat(response.getData().get(0).getAttributes().getBrand(), is("BMW"));
+
+		assertThat(response.getData().get(1).getType(), is("cars"));
+		assertThat(response.getData().get(1).getId(), is("911"));
+		assertThat(response.getData().get(1).getAttributes().getId(), nullValue());
+		assertThat(response.getData().get(1).getAttributes().getBrand(), is("Porshe"));
+
+		assertThat(response.getMeta().getApi().getVersion(), is("1"));
+	}
+
+	@Test
+	@SneakyThrows
+	public void shouldParseJsonResponseWithSingleObjectData() {
+		final String data = "{\n" +
+			"    \"data\": \n" +
+			"    {\n" +
+			"        \"type\": \"cars\",\n" +
+			"        \"id\": \"M5\",\n" +
+			"        \"attributes\": {\n" +
+			"            \"id\": \"M5\",\n" +
+			"            \"brand\": \"BMW\"\n" +
+			"        }\n" +
+			"    },\n" +
+			"    \"meta\": {\n" +
+			"        \"api\": {\n" +
+			"            \"version\": \"1\"\n" +
+			"        }\n" +
+			"    }\n" +
+			"}";
+		final TypeReference<Response<Data<TestCarDto>>> type = new TypeReference<>() {};
+		final Response<Data<TestCarDto>> response = new ObjectMapper().readValue(data, type);
+
+		assertThat(response.getErrors(), nullValue());
+
+		assertThat(response.getData().getType(), is("cars"));
+		assertThat(response.getData().getId(), is("M5"));
+		assertThat(response.getData().getAttributes().getId(), nullValue());
+		assertThat(response.getData().getAttributes().getBrand(), is("BMW"));
+
+		assertThat(response.getMeta().getApi().getVersion(), is("1"));
+	}
+
+	@lombok.Data
+	private static class TestCarDto {
+		private String id;
+		private String brand;
+	}
+
+	@Test
+	@SneakyThrows
+	public void shouldParseJsonResponseWithErrors() {
+		final String data = "{\n" +
+			"    \"errors\": [\n" +
+			"        {\n" +
+			"            \"code\": \"400\",\n" +
+			"            \"source\": {\n" +
+			"                \"parameter\": \"name\"\n" +
+			"            }\n" +
+			"        }\n" +
+			"    ],\n" +
+			"    \"meta\": {\n" +
+			"        \"api\": {\n" +
+			"            \"version\": \"1\"\n" +
+			"        }\n" +
+			"    }\n" +
+			"}";
+		final TypeReference<Response<List<Data<Map<String, Object>>>>> type = new TypeReference<>() {};
+		final Response<List<Data<Map<String, Object>>>> response = new ObjectMapper().readValue(data, type);
+
+		assertThat(response.getErrors().size(), is(1));
+		assertThat(response.getErrors().get(0).getCode(), is("400"));
+		assertThat(response.getErrors().get(0).getSource().getParameter(), is("name"));
 	}
 
 	private TestDto buildTestDto1() {

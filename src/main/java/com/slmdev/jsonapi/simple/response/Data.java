@@ -4,33 +4,37 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
+@NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Data<T> {
-    private final String type;
-    private final String id;
+    private String type;
+    private String id;
     @JsonIgnoreProperties({"id"})
-    private final T attributes;
-    private final Link links;
+    private T attributes;
+    private Link links;
 
     @Getter
     @ToString
+    @NoArgsConstructor
     @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Link {
-        private final String self;
-        private final RelatedLink related;
+        private String self;
+        private RelatedLink related;
     }
 
     @Getter
     @ToString
+    @NoArgsConstructor
     @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class RelatedLink {
-        private final String href;
+        private String href;
     }
 }

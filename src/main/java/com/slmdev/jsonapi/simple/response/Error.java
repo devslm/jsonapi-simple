@@ -3,13 +3,14 @@ package com.slmdev.jsonapi.simple.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Getter
 @ToString
+@NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -25,7 +26,9 @@ public class Error {
 
     @Getter
     @ToString
-    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Accessors(chain = true)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Source {
         private String parameter;

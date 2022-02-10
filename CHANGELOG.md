@@ -1,9 +1,14 @@
 # Changelog
 
+## [1.6.0] - 2022-02-10
+### Added:
+  - Now possible to deserialize string value as JSON API response
+  - Method to set manually JSON API id without **@JsonApiId** annotation when set manually JSON API data type.
+
 ## [1.5.0] - 2022-02-09
 ### Added:
   - Pagination support
-  - Method to set manually data type without **@JsonApyType** annotation to use different data types like maps, lists etc.
+  - Method to set manually JSON API data type without **@JsonApiType** annotation to use different data types like maps, lists etc.
 
 ### Changed:
   - Update mockito version 
