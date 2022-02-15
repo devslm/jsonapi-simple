@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.6.1] - 2022-02-15
+### Changed:
+  - Replace @Setter lombok annotation in Page class on @Data and add @JsonInclude(JsonInclude.Include.NON_NULL) annotation
+
 ## [1.6.0] - 2022-02-10
 ### Added:
   - Now possible to deserialize string value as JSON API response

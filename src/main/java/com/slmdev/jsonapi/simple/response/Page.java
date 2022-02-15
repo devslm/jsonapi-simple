@@ -1,6 +1,7 @@
 package com.slmdev.jsonapi.simple.response;
 
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
@@ -33,8 +34,9 @@ import lombok.experimental.Accessors;
  * </pre>
  * @param <T> data object type
  */
-@Setter
+@Data
 @Accessors(chain = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Page<T> {
     private T data;
     private String prev;
