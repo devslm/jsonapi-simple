@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.7.0] - 2022-08-22
+### Added:
+  - Methods to get typed params from filter (i.e. **stringValue**, **listOfUuidValues** etc.)
+  
+### Changed:
+  - Page now starts from 0 instead of 1
+
+### Changed:
+  - Update all dependencies versions
+
 ## [1.6.1] - 2022-02-15
 ### Changed:
   - Replace @Setter lombok annotation in Page class on @Data and add @JsonInclude(JsonInclude.Include.NON_NULL) annotation

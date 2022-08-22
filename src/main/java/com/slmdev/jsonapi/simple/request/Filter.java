@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Class contains filter values from {@code GET} requests.
@@ -73,6 +74,114 @@ public class Filter {
         requestParams.put(key, filterItem);
 
         return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Optional<List<String>> listOfStringValues(final @NonNull String name) {
+        if (hasParam(name)
+                && requestParams.get(name).getValue() instanceof Collection) {
+            return Optional.of(
+                (List<String>)requestParams.get(name).getValue()
+            );
+        }
+        return Optional.empty();
+    }
+
+    @SuppressWarnings("unchecked")
+    public Optional<List<Integer>> listOfIntegerValues(final @NonNull String name) {
+        if (hasParam(name)
+                && requestParams.get(name).getValue() instanceof Collection) {
+            return Optional.of(
+                ((List<String>)requestParams.get(name).getValue()).stream()
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList())
+            );
+        }
+        return Optional.empty();
+    }
+
+    @SuppressWarnings("unchecked")
+    public Optional<List<UUID>> listOfUuidValues(final @NonNull String name) {
+        if (hasParam(name)
+                && requestParams.get(name).getValue() instanceof Collection) {
+            return Optional.of(
+                ((List<String>)requestParams.get(name).getValue()).stream()
+                    .map(UUID::fromString)
+                    .collect(Collectors.toList())
+            );
+        }
+        return Optional.empty();
+    }
+
+    public Optional<String> stringValue(final @NonNull String name) {
+        final String param = getFilterValue(name);
+
+        if (param != null) {
+            return Optional.of(param);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Integer> intValue(final @NonNull String name) {
+        final String param = getFilterValue(name);
+
+        if (param != null) {
+            return Optional.of(Integer.parseInt(param));
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Long> longValue(final @NonNull String name) {
+        final String param = getFilterValue(name);
+
+        if (param != null) {
+            return Optional.of(Long.parseLong(param));
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Boolean> boolValue(final @NonNull String name){
+        final String param = getFilterValue(name);
+
+        if (param != null) {
+            return Optional.of(Boolean.parseBoolean(param));
+        }
+        return Optional.empty();
+    }
+
+    public Optional<UUID> uuidValue(final @NonNull String name){
+        final String param = getFilterValue(name);
+
+        if (param != null) {
+            return Optional.of(UUID.fromString(param));
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Object> getAsObject(final @NonNull String name) {
+        if (hasParam(name)) {
+            return Optional.of(
+                requestParams.get(name).getValue()
+            );
+        }
+        return Optional.empty();
+    }
+
+    private String getFilterValue(final @NonNull String name) {
+        final StringBuilder param = new StringBuilder();
+
+        getAsObject(name).ifPresent(value -> {
+            if (value instanceof Collection) {
+                final List values = (List)value;
+
+                if (!values.isEmpty()) {
+                    param.append(values.get(0));
+                }
+            } else {
+                param.append(value);
+            }
+        });
+        return (param.length() > 0 ? param.toString() : null);
     }
 
     public static Filter.FilterItem.FilterItemBuilder in(final @NonNull List<?> values) {

@@ -96,7 +96,7 @@ public class ResponseTest {
 	}
 
 	@Test
-	public void shouldReturnResponseWithDataAndUriSpecifiedWithoutUriPlaceholdersAndErrors() {
+	public void shouldReturnResponseWithDataAndUriSpecifiedWithoutUriPlaceholdersAndErrors() throws Exception {
 		final TestDto testDto = buildTestDto1();
 		final Response<Data<TestDto>> response = Response.<Data<TestDto>, TestDto>builder()
 			.uri(TEST_RESPONSE_URI)

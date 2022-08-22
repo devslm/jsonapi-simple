@@ -16,7 +16,7 @@ Add dependency to your project:
 <dependency>
     <groupId>com.slm-dev</groupId>
     <artifactId>jsonapi-simple</artifactId>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
 </dependency>
 ```
 
@@ -211,6 +211,16 @@ Then you can use annotation ```@RequestJsonApiFilter``` in controllers with one 
 
 **If filter operator omitted ```eq``` will be used by default!** 
 
+You can get typed params from filter using next methods:
+  - listOfStringValues(param)
+  - listOfIntegerValues(param)
+  - listOfUuidValues(param)
+  - stringValue(param)
+  - intValue(param)
+  - longValue(param)
+  - boolValue(param)
+  - uuidValue(param)
+
 For example:
 ```java
 @Slf4j
@@ -221,7 +231,8 @@ public class RestController {
     @GetMapping
     public Response<Void> get(final @RequestJsonApiFilter Filter filter) throws Exception {
         if (filter.hasParam("key")) {
-            final List<String> filterValues = filter.getParam("key");
+            final List<String> filterValues = filter.listOfStringValues("key");
+            final UUID filterUuidValue = filter.uuidValue("key");
 
             // do something with filter param
         }
@@ -330,10 +341,9 @@ Supported fields for the page number are:
 And for the page size are:
   - **page[size]**
   - **page[limit]**
-  
 
-###If request page number < 1 resolver always return number = 1 and if size < 1 it always returns default value = 25!
-
+#### Request page always starts from 0 for compatible with spring repositories and etc.!
+#### If request page number < 1 resolver always return number = 0 and if size < 1 it always returns default value = 25!
 
 ### Other response examples
 Example response with one data object:

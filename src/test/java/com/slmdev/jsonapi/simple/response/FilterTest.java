@@ -24,8 +24,16 @@ public class FilterTest {
 
     private static final String TEST_FILTER_KEY = "name";
     private static final String TEST_FILTER_KEY_2 = "key-2";
-    private static final String[] TEST_FILTER_ONE_VALUE = new String[] {"abc"};
-    private static final String[] TEST_FILTER_LIST_VALUE = new String[] {"abc", "123"};
+
+    private static final String TEST_FILTER_VALUE_STRING = "abc";
+    private static final int TEST_FILTER_VALUE_INT = 123;
+    private static final boolean TEST_FILTER_VALUE_BOOL = true;
+    private static final UUID TEST_FILTER_VALUE_UUID = UUID.randomUUID();
+    private static final String[] TEST_FILTER_ONE_VALUE = new String[] {TEST_FILTER_VALUE_STRING};
+    private static final String[] TEST_FILTER_LIST_VALUE = new String[] {TEST_FILTER_VALUE_STRING, String.valueOf(TEST_FILTER_VALUE_INT)};
+    private static final String[] TEST_FILTER_ONE_INT_VALUE = new String[] {String.valueOf(TEST_FILTER_VALUE_INT)};
+    private static final String[] TEST_FILTER_BOOL_VALUE = new String[] {String.valueOf(TEST_FILTER_VALUE_BOOL)};
+    private static final String[] TEST_FILTER_UUID_VALUE = new String[] {TEST_FILTER_VALUE_UUID.toString()};
 
     private JsonApiFilterArgumentResolver jsonApiFilterArgumentResolver;
 
@@ -131,7 +139,75 @@ public class FilterTest {
     }
 
     @Test
-    public void shouldParseFilterWith2Keys() {
+    public void shouldParseFilterAndGetStringsListValue() {
+        final String value1 = "str1";
+        final String value2 = "str2";
+        final Filter filter = shouldParseFilterWithOperator(TEST_FILTER_KEY, Filter.FilterItem.Operator.IN, new String[] {value1, value2});
+        final List<String> values = filter.listOfStringValues(TEST_FILTER_KEY).get();
+
+        assertThat(values.get(0), is(value1));
+        assertThat(values.get(1), is(value2));
+    }
+
+    @Test
+    public void shouldParseFilterAndGetIntsListValue() {
+        final int value1 = 123;
+        final int value2 = 678;
+        final Filter filter = shouldParseFilterWithOperator(TEST_FILTER_KEY, Filter.FilterItem.Operator.IN, new String[] {value1 + "", value2 + ""});
+        final List<Integer> values = filter.listOfIntegerValues(TEST_FILTER_KEY).get();
+
+        assertThat(values.get(0), is(value1));
+        assertThat(values.get(1), is(value2));
+    }
+
+    @Test
+    public void shouldParseFilterAndGetUuidsListValue() {
+        final UUID value1 = UUID.randomUUID();
+        final UUID value2 = UUID.randomUUID();
+        final Filter filter = shouldParseFilterWithOperator(TEST_FILTER_KEY, Filter.FilterItem.Operator.IN, new String[] {value1.toString(), value2.toString()});
+        final List<UUID> values = filter.listOfUuidValues(TEST_FILTER_KEY).get();
+
+        assertThat(values.get(0), is(value1));
+        assertThat(values.get(1), is(value2));
+    }
+
+    @Test
+    public void shouldParseFilterAndGetStringValue() {
+        final Filter filter = shouldParseFilterWithOperator(TEST_FILTER_KEY, Filter.FilterItem.Operator.EQ, TEST_FILTER_ONE_VALUE);
+
+        assertThat(filter.stringValue(TEST_FILTER_KEY).get(), is(TEST_FILTER_VALUE_STRING));
+    }
+
+    @Test
+    public void shouldParseFilterAndGetIntValue() {
+        final Filter filter = shouldParseFilterWithOperator(TEST_FILTER_KEY, Filter.FilterItem.Operator.EQ, TEST_FILTER_ONE_INT_VALUE);
+
+        assertThat(filter.intValue(TEST_FILTER_KEY).get(), is(TEST_FILTER_VALUE_INT));
+    }
+
+    @Test
+    public void shouldParseFilterAndGetLongValue() {
+        final Filter filter = shouldParseFilterWithOperator(TEST_FILTER_KEY, Filter.FilterItem.Operator.EQ, TEST_FILTER_ONE_INT_VALUE);
+
+        assertThat(filter.longValue(TEST_FILTER_KEY).get(), is((long)TEST_FILTER_VALUE_INT));
+    }
+
+    @Test
+    public void shouldParseFilterAndGetBoolValue() {
+        final Filter filter = shouldParseFilterWithOperator(TEST_FILTER_KEY, Filter.FilterItem.Operator.EQ, TEST_FILTER_BOOL_VALUE);
+
+        assertThat(filter.boolValue(TEST_FILTER_KEY).get(), is(TEST_FILTER_VALUE_BOOL));
+    }
+
+    @Test
+    public void shouldParseFilterAndGetUuidValue() {
+        final Filter filter = shouldParseFilterWithOperator(TEST_FILTER_KEY, Filter.FilterItem.Operator.EQ, TEST_FILTER_UUID_VALUE);
+
+        assertThat(filter.uuidValue(TEST_FILTER_KEY).get(), is(TEST_FILTER_VALUE_UUID));
+    }
+
+    @Test
+    public Filter shouldParseFilterWith2Keys() {
         final Map<String, String[]> filterParams = new HashMap<>();
         filterParams.put(
             REQUEST_FILTER_ARGUMENT_NAME + "[" + TEST_FILTER_KEY + "]" +
@@ -156,11 +232,13 @@ public class FilterTest {
         assertThat(filter.getParam(TEST_FILTER_KEY_2).getField(), is(TEST_FILTER_KEY_2));
         assertThat(filter.getParam(TEST_FILTER_KEY_2).getOperator(), is(Filter.FilterItem.Operator.EQ));
         assertThat(filter.getParam(TEST_FILTER_KEY_2).getValue(), is(Arrays.asList(TEST_FILTER_ONE_VALUE)));
+
+        return filter;
     }
 
-    private void shouldParseFilterWithOperator(final @NonNull String key,
-                                               final @NonNull Filter.FilterItem.Operator operator,
-                                               final @NonNull String[] value) {
+    private Filter shouldParseFilterWithOperator(final @NonNull String key,
+                                                 final @NonNull Filter.FilterItem.Operator operator,
+                                                 final @NonNull String[] value) {
         final Map<String, String[]> filterParams = new HashMap<>();
         filterParams.put(REQUEST_FILTER_ARGUMENT_NAME + "[" + key + "][" + operator.name().toLowerCase() + "]", value);
 
@@ -172,5 +250,7 @@ public class FilterTest {
         assertThat(filter.getParam(key).getField(), is(key));
         assertThat(filter.getParam(key).getOperator(), is(operator));
         assertThat(filter.getParam(key).getValue(), is(Arrays.asList(value)));
+
+        return filter;
     }
 }

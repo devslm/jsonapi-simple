@@ -36,7 +36,7 @@ public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolve
                                   final WebDataBinderFactory webDataBinderFactory) {
         final RequestJsonApiPage RequestJsonApiPage = methodParameter.getParameterAnnotation(RequestJsonApiPage.class);
         final String pageKeyStart = RequestJsonApiPage.name() + REQUEST_PAGE_KEY_BRACKET_START;
-        int page = 1;
+        int page = 0;
         int size = 25;
 
         final List<Map.Entry<String, String[]>> entries = nativeWebRequest.getParameterMap()
@@ -57,7 +57,7 @@ public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolve
             switch (fieldName) {
                 case "page":
                 case "number":
-                    page = value;
+                    page = value - 1;
                     break;
                 case "size":
                 case "limit":
@@ -69,7 +69,7 @@ public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolve
         }
 
         if (page < 1) {
-            page = 1;
+            page = 0;
         }
 
         if (size < 1) {
