@@ -39,7 +39,7 @@
 		<spring.data.commons.version>2.7.2</spring.data.commons.version>
 		<lombok.version>1.18.24</lombok.version>
 		<lombok.maven.plugin.version>1.18.20.0</lombok.maven.plugin.version>
-		<jackson.version>2.13.3</jackson.version>
+		<jackson.version>2.13.4.1</jackson.version>
 		<sprinfox.version>3.0.0</sprinfox.version>
 		<junit.version>5.9.0</junit.version>
 		<hamcrest.version>2.2</hamcrest.version>
