@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0] - 2022-11-01
+### Added:
+  - Error links object support
+
+### Changed:
+  - Update all dependencies versions
+
 ## [1.7.0] - 2022-08-22
 ### Added:
   - Methods to get typed params from filter (i.e. **stringValue**, **listOfUuidValues** etc.)

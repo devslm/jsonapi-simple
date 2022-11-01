@@ -16,7 +16,7 @@ Add dependency to your project:
 <dependency>
     <groupId>com.slm-dev</groupId>
     <artifactId>jsonapi-simple</artifactId>
-    <version>1.7.0</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 
@@ -464,7 +464,7 @@ public class Test {
 }
 ```
 
-Example response with error (data is empty so we use ```Void``` class as generic parameter):
+Example response with error (data is empty, so we use ```Void``` class as generic parameter):
 ```java
 // Pseudo code
 public class Test {
@@ -472,7 +472,7 @@ public class Test {
         return Response.<Void, Void>builder()
             .error(
                 HttpStatus.BAD_REQUEST,
-                "TOKEN_ERROR",
+                "20045",
                 "Some errors occurred!"
             ).build();
     }
@@ -483,8 +483,52 @@ public class Test {
   "errors": [
     {
       "status": 400,
-      "code": "TOKEN_ERROR",
+      "code": "20045",
       "detail": "Some errors occurred!"
+    }
+  ],
+  "meta": {
+    "api": {
+      "version": "1"
+    },
+    "page": {
+      "maxSize": 25,
+      "total": 0
+    }
+  }
+}
+```
+
+Example response with error with links (data is empty, so we use ```Void``` class as generic parameter):
+```java
+// Pseudo code
+public class Test {
+    public Response<Void> main() {
+        final Error.ErrorLink errorLink = Error.ErrorLink
+            .builder()
+            .about("https://example.org/docs/TOKEN_ERROR")
+            .build();
+        
+        return Response.<Void, Void>builder()
+            .error(
+                HttpStatus.BAD_REQUEST,
+                "20045",
+                "Some errors occurred!",
+                errorLink
+            ).build();
+    }
+}
+```
+```json
+{
+  "errors": [
+    {
+      "status": 400,
+      "code": "20045",
+      "detail": "Some errors occurred!",
+      "links": {
+          "about": "https://example.org/docs/20045"
+      }
     }
   ],
   "meta": {

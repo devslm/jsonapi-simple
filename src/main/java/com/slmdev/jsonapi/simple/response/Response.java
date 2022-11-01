@@ -345,7 +345,8 @@ public class Response<T> {
                 HttpStatus.BAD_REQUEST,
                 "VALIDATION_ERROR",
                 detail,
-                errorValidationField
+                errorValidationField,
+                null
             );
         }
 
@@ -357,7 +358,7 @@ public class Response<T> {
          * @return self link
          */
         public ResponseBuilder<T, V> error(final HttpStatus status, final String detail) {
-            return error(status, null, detail, null);
+            return error(status, null, detail, null, null);
         }
 
         /**
@@ -369,7 +370,7 @@ public class Response<T> {
          * @return self link
          */
         public ResponseBuilder<T, V> error(final HttpStatus status, final String code, final String detail) {
-            return error(status, code, detail, null);
+            return error(status, code, detail, null, null);
         }
 
         /**
@@ -388,6 +389,46 @@ public class Response<T> {
                                            final String code,
                                            final @NonNull String detail,
                                            final String errorValidationField) {
+            return error(status, code, detail, errorValidationField, null);
+        }
+
+        /**
+         * Create errors object.
+         *
+         * <p>We can invoke this method as many times as we need and
+         * result object will contain all errors we passed.
+         *
+         * @param status spring {@link HttpStatus} object
+         * @param code internal error code (if exists)
+         * @param detail detail information about error
+         * @param links field with links for the details about error
+         * @return self link
+         */
+        public ResponseBuilder<T, V> error(final HttpStatus status,
+                                           final String code,
+                                           final @NonNull String detail,
+                                           final Error.ErrorLink links) {
+            return error(status, code, detail, null, links);
+        }
+
+        /**
+         * Create errors object.
+         *
+         * <p>We can invoke this method as many times as we need and
+         * result object will contain all errors we passed.
+         *
+         * @param status spring {@link HttpStatus} object
+         * @param code internal error code (if exists)
+         * @param detail detail information about error
+         * @param errorValidationField field with failed validation
+         * @param links field with links for the details about error
+         * @return self link
+         */
+        public ResponseBuilder<T, V> error(final HttpStatus status,
+                                           final String code,
+                                           final @NonNull String detail,
+                                           final String errorValidationField,
+                                           final Error.ErrorLink links) {
             if (this.errors == null) {
                 this.errors = new ArrayList<>();
             }
@@ -397,7 +438,7 @@ public class Response<T> {
                 errorSource = new Error.Source(errorValidationField);
             }
             this.errors.add(
-                new Error(status.value(), code, detail, errorSource)
+                new Error(status.value(), code, detail, errorSource, links)
             );
             this.dataList = null;
             this.dataObject = null;

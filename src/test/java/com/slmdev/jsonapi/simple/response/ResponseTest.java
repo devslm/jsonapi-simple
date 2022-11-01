@@ -225,6 +225,22 @@ public class ResponseTest {
 	}
 
 	@Test
+	public void shouldReturnResponseWithErrorWithLinkAndWith() {
+		final Error.ErrorLink errorLink = Error.ErrorLink
+			.builder()
+			.about("https://example.org/docs/" + ERROR_CODE)
+			.build();
+
+		final Response<Void> response = Response.<Void, Void>builder()
+			.error(HttpStatus.BAD_REQUEST, ERROR_CODE, ERROR_DESCRIPTION, errorLink)
+			.build();
+
+		assertErrorResponse(response);
+
+		assertThat(response.getErrors().get(0).getLinks().getAbout(), is(errorLink.getAbout()));
+	}
+
+	@Test
 	public void shouldReturnResponseWithEmptyDataAndChangedMetaVersion() {
 		final Response<Void> response = Response.<Void, Void>builder()
 			.apiVersion("2")
