@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.slm-dev</groupId>
 	<artifactId>jsonapi-simple</artifactId>
-	<version>1.8.0</version>
+	<version>1.9.0</version>
 	<name>jsonapi-simple</name>
 	<description>Simple implementation of the JSON:API specification</description>
 	<url>https://slm-dev.com/jsonapi-simple/</url>

@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.9.0] - 2022-11-07
+### Added:
+  - Trace object with id field to meta object
+
 ## [1.8.0] - 2022-11-01
 ### Added:
   - Error links object support

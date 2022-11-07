@@ -81,6 +81,7 @@ public class Response<T> {
             this.meta = new Meta(
                 new Api(DEFAULT_API_VERSION),
                 new Meta.Page(DEFAULT_MAX_PAGE_SIZE, -1, null, null),
+                null,
                 null
             );
         }
@@ -515,6 +516,16 @@ public class Response<T> {
          */
         public ResponseBuilder<T, V> metaWebSocket(final @NonNull Meta.WebSocket metaWebSocket) {
             meta.setWebSocket(metaWebSocket);
+
+            return this;
+        }
+
+        /**
+         * @param trace trace specific meta information
+         * @return self link
+         */
+        public ResponseBuilder<T, V> metaTrace(final @NonNull Meta.Trace trace) {
+            meta.setTrace(trace);
 
             return this;
         }

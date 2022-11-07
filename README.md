@@ -16,7 +16,7 @@ Add dependency to your project:
 <dependency>
     <groupId>com.slm-dev</groupId>
     <artifactId>jsonapi-simple</artifactId>
-    <version>1.8.0</version>
+    <version>1.9.0</version>
 </dependency>
 ```
 
@@ -576,5 +576,50 @@ public class Test {
       "total": 0
     }
   }
+}
+```
+
+Example response with trace id (trace id can be string or UUID):
+```java
+// Pseudo code
+public class Test {
+    public Response<Void> main() {
+        return Response.<Void, Void>builder()
+            .data(
+                TestDto.builder()
+                    .id(UUID.randomUUID())
+                    .name("Test string")
+                    .createDate(LocalDateTime.now(ZoneOffset.UTC))
+                    .build()
+            ).metaTrace(new Meta.Trace(UUID.randomUUID()))
+            .build();
+    }
+}
+```
+```json
+{
+    "data": {
+        "type":"test-object",
+        "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
+        "attributes": {
+            "name":"Test string",
+            "createDate":"2019-10-08T18:46:53.40297"
+        },
+        "links": {
+            "self": "/test-object/7a543e90-2961-480e-b1c4-51249bf0c566"
+        }
+    },
+    "meta": {
+        "api": {
+            "version":"1"
+        },
+        "page": {
+            "maxSize":25,
+            "total":1
+        },
+        "trace": {
+            "id": "1a443e90-6961-480e-b1c4-51249bf0c566"
+        }
+    }
 }
 ```

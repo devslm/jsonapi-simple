@@ -290,15 +290,51 @@ public class ResponseTest {
 	}
 
 	@Test
+	public void shouldReturnResponseWithTraceIdAsString() {
+		final String id = UUID.randomUUID().toString();
+		final String traceId = UUID.randomUUID().toString();
+		final Response<Data<Map<String, List<String>>>> response = Response.<Data<Map<String, List<String>>>, Map<String, List<String>>>builder()
+			.jsonApiId(id)
+			.jsonApiType("custom-data-type")
+			.data(Map.of("key", List.of("value")))
+			.metaTrace(new Meta.Trace(traceId))
+			.build();
+
+		assertThat(response.getData().getId(), is(id));
+		assertThat(response.getData().getType(), is("custom-data-type"));
+		assertThat(response.getData().getAttributes().get("key"), is(List.of("value")));
+
+		assertThat(response.getMeta().getApi().getVersion(), is("1"));
+		assertThat(response.getMeta().getTrace().getId(), is(traceId));
+	}
+
+	@Test
+	public void shouldReturnResponseWithTraceIdAsUuid() {
+		final String id = UUID.randomUUID().toString();
+		final UUID traceId = UUID.randomUUID();
+		final Response<Data<Map<String, List<String>>>> response = Response.<Data<Map<String, List<String>>>, Map<String, List<String>>>builder()
+			.jsonApiId(id)
+			.jsonApiType("custom-data-type")
+			.data(Map.of("key", List.of("value")))
+			.metaTrace(new Meta.Trace(traceId))
+			.build();
+
+		assertThat(response.getData().getId(), is(id));
+		assertThat(response.getData().getType(), is("custom-data-type"));
+		assertThat(response.getData().getAttributes().get("key"), is(List.of("value")));
+
+		assertThat(response.getMeta().getApi().getVersion(), is("1"));
+		assertThat(response.getMeta().getTrace().getId(), is(traceId.toString()));
+	}
+
+	@Test
 	public void shouldThrowExceptionWithManuallyDataTypeAndInValidInvokesOrder() {
 		Assertions.assertThrows(
 			RuntimeException.class,
-			() -> {
-				Response.<Data<Map<String, String>>, Map<String, String>>builder()
-					.data(Map.of("key", "value"))
-					.jsonApiType("custom-data-type")
-					.build();
-			}
+			() -> Response.<Data<Map<String, String>>, Map<String, String>>builder()
+				.data(Map.of("key", "value"))
+				.jsonApiType("custom-data-type")
+				.build()
 		);
 	}
 
@@ -410,6 +446,39 @@ public class ResponseTest {
 		assertThat(response.getErrors().size(), is(1));
 		assertThat(response.getErrors().get(0).getCode(), is("400"));
 		assertThat(response.getErrors().get(0).getSource().getParameter(), is("name"));
+	}
+
+	@Test
+	@SneakyThrows
+	public void shouldParseJsonResponseWithMetaTrace() {
+		final String traceId = UUID.randomUUID().toString();
+		final String data = "{\n" +
+			"    \"errors\": [\n" +
+			"        {\n" +
+			"            \"code\": \"400\",\n" +
+			"            \"source\": {\n" +
+			"                \"parameter\": \"name\"\n" +
+			"            }\n" +
+			"        }\n" +
+			"    ],\n" +
+			"    \"meta\": {\n" +
+			"        \"api\": {\n" +
+			"            \"version\": \"1\"\n" +
+			"        },\n" +
+			"        \"trace\": {\n" +
+			"            \"id\": \"" + traceId + "\"\n" +
+			"        }\n" +
+			"    }\n" +
+			"}";
+		final TypeReference<Response<List<Data<Map<String, Object>>>>> type = new TypeReference<>() {};
+		final Response<List<Data<Map<String, Object>>>> response = new ObjectMapper().readValue(data, type);
+
+		assertThat(response.getErrors().size(), is(1));
+		assertThat(response.getErrors().get(0).getCode(), is("400"));
+		assertThat(response.getErrors().get(0).getSource().getParameter(), is("name"));
+
+		assertThat(response.getMeta().getApi().getVersion(), is("1"));
+		assertThat(response.getMeta().getTrace().getId(), is(traceId));
 	}
 
 	private TestDto buildTestDto1() {

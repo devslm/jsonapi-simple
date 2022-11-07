@@ -16,6 +16,7 @@ public class Meta {
     private Api api;
     private Page page;
     private WebSocket webSocket;
+    private Trace trace;
 
     @Data
     @AllArgsConstructor
@@ -23,7 +24,7 @@ public class Meta {
     public static class Page {
         @ApiModelProperty(value = "Page size", required = true)
         private int maxSize;
-        @ApiModelProperty(value = "Totatl number data objects", required = true)
+        @ApiModelProperty(value = "Total number data objects", required = true)
         private long total;
         @ApiModelProperty("Link to the previous page if exist")
         private String prev;
@@ -36,6 +37,26 @@ public class Meta {
     @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class WebSocket {
+        @ApiModelProperty("Websocket session id")
         private UUID sessionId;
+    }
+
+    @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class Trace {
+        public Trace() {
+
+        }
+
+        public Trace(final String id) {
+            this.id = id;
+        }
+
+        public Trace(final UUID id) {
+            this.id = id.toString();
+        }
+
+        @ApiModelProperty("Trace id (any string identifier, ie request id)")
+        private String id;
     }
 }
