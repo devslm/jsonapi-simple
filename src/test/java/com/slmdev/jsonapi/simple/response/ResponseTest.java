@@ -19,8 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 public class ResponseTest {
 	private static final String TEST_RESPONSE_URI = "/api/v1";
@@ -58,7 +57,7 @@ public class ResponseTest {
 		assertThat(response.getMeta().getPage().getMaxSize(), is(25));
 		assertThat(response.getMeta().getPage().getTotal(), is(1L));
 
-		assertThatAttributesIdFieldIsAbsentInObject(response);
+		assertThatAttributesIdFieldIsPresentInObject(response);
 	}
 
 	@Test
@@ -92,7 +91,7 @@ public class ResponseTest {
 		assertThat(response.getMeta().getPage().getMaxSize(), is(25));
 		assertThat(response.getMeta().getPage().getTotal(), is(2L));
 
-		assertThatAttributesIdFieldIsAbsentInCollection(response);
+		assertThatAttributesIdFieldIsPresentInCollection(response);
 	}
 
 	@Test
@@ -116,7 +115,7 @@ public class ResponseTest {
 		assertThat(response.getMeta().getPage().getMaxSize(), is(25));
 		assertThat(response.getMeta().getPage().getTotal(), is(1L));
 
-		assertThatAttributesIdFieldIsAbsentInObject(response);
+		assertThatAttributesIdFieldIsPresentInObject(response);
 	}
 
 	@Test
@@ -143,7 +142,7 @@ public class ResponseTest {
 		assertThat(response.getMeta().getPage().getMaxSize(), is(25));
 		assertThat(response.getMeta().getPage().getTotal(), is(1L));
 
-		assertThatAttributesIdFieldIsAbsentInObject(response);
+		assertThatAttributesIdFieldIsPresentInObject(response);
 	}
 
 
@@ -373,15 +372,15 @@ public class ResponseTest {
 
 		assertThat(response.getData().get(0).getType(), is("cars"));
 		assertThat(response.getData().get(0).getId(), is("M5"));
-		assertThat(response.getData().get(0).getAttributes().getId(), nullValue());
 		assertThat(response.getData().get(0).getAttributes().getBrand(), is("BMW"));
 
 		assertThat(response.getData().get(1).getType(), is("cars"));
 		assertThat(response.getData().get(1).getId(), is("911"));
-		assertThat(response.getData().get(1).getAttributes().getId(), nullValue());
 		assertThat(response.getData().get(1).getAttributes().getBrand(), is("Porshe"));
 
 		assertThat(response.getMeta().getApi().getVersion(), is("1"));
+
+		assertThatAttributesIdFieldIsPresentInCollection(response);
 	}
 
 	@Test
@@ -410,10 +409,11 @@ public class ResponseTest {
 
 		assertThat(response.getData().getType(), is("cars"));
 		assertThat(response.getData().getId(), is("M5"));
-		assertThat(response.getData().getAttributes().getId(), nullValue());
 		assertThat(response.getData().getAttributes().getBrand(), is("BMW"));
 
 		assertThat(response.getMeta().getApi().getVersion(), is("1"));
+
+		assertThatAttributesIdFieldIsPresentInObject(response);
 	}
 
 	@lombok.Data
@@ -519,7 +519,7 @@ public class ResponseTest {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void assertThatAttributesIdFieldIsAbsentInCollection(final @NonNull Response<List<Data<TestDto>>> response) {
+	private void assertThatAttributesIdFieldIsPresentInCollection(final @NonNull Object response) {
 		final Map<String, Object> responseMap = objectMapper.convertValue(response, Map.class);
 
 		((List<Object>)responseMap.get("data")).forEach(dataItem -> {
@@ -527,12 +527,12 @@ public class ResponseTest {
 				.get("attributes"))
 				.get("id");
 
-			assertThat(idAttributeField, nullValue());
+			assertThat(idAttributeField, notNullValue());
 		});
 	}
 
 	@SuppressWarnings("unchecked")
-	private void assertThatAttributesIdFieldIsAbsentInObject(final @NonNull Response<Data<TestDto>> response) {
+	private void assertThatAttributesIdFieldIsPresentInObject(final @NonNull Object response) {
 		final Map<String, Object> responseMap = objectMapper.convertValue(response, Map.class);
 
 		final Object idAttributeField = ((Map<String, Object>)((Map<String, Object>)responseMap
@@ -540,6 +540,6 @@ public class ResponseTest {
 			.get("attributes"))
 			.get("id");
 
-		assertThat(idAttributeField, nullValue());
+		assertThat(idAttributeField, notNullValue());
 	}
 }

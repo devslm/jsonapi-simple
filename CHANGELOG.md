@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.10.0] - 2023-02-21
+### Changed:
+  - Add id field to attributes (more usable for api clients)
+  - Update all dependencies versions
+
 ## [1.9.0] - 2022-11-07
 ### Added:
   - Trace object with id field to meta object

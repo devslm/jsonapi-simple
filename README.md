@@ -16,9 +16,12 @@ Add dependency to your project:
 <dependency>
     <groupId>com.slm-dev</groupId>
     <artifactId>jsonapi-simple</artifactId>
-    <version>1.9.0</version>
+    <version>1.10.0</version>
 </dependency>
 ```
+
+> **Warning:**
+> The id field is included in the attributes because it more convenient for API clients.
 
 ### Build Response
 
@@ -100,6 +103,7 @@ This produces response like:
     "type":"some-data-type",
     "id":"<random-uuid-id> or <fixed-id>",
     "attributes": {
+      "id":"<random-uuid-id> or <fixed-id>",
       "name": "Test string"
     },
     "links": {
@@ -376,6 +380,7 @@ public class Test {
     "type":"test-object",
     "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
     "attributes": {
+      "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
       "name":"Test string",
       "createDate":"2019-10-08T18:46:53.40297"
     }, 
@@ -433,6 +438,7 @@ public class Test {
       "type":"test-object",
       "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
       "attributes": {
+        "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
         "name":"Test string 1",
         "createDate":"2019-10-08T18:46:53"
       }, 
@@ -441,7 +447,8 @@ public class Test {
       }
     },
     {
-      "type":"test-object",
+      "type":"test-object", 
+      "id":"b4070518-e9fc-11e9-81b4-2a2ae2dbcce4",
       "attributes": {
         "id":"b4070518-e9fc-11e9-81b4-2a2ae2dbcce4",
         "name":"Test string 2",
@@ -602,6 +609,7 @@ public class Test {
         "type":"test-object",
         "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
         "attributes": {
+            "id":"7a543e90-2961-480e-b1c4-51249bf0c566",
             "name":"Test string",
             "createDate":"2019-10-08T18:46:53.40297"
         },

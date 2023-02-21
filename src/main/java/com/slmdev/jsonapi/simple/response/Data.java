@@ -1,6 +1,5 @@
 package com.slmdev.jsonapi.simple.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +14,6 @@ import lombok.ToString;
 public class Data<T> {
     private String type;
     private String id;
-    @JsonIgnoreProperties({"id"})
     private T attributes;
     private Link links;
 
