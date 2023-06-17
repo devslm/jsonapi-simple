@@ -2,40 +2,22 @@ package com.slmdev.jsonapi.simple.response;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
-public class ResponseTest {
-	private static final String TEST_RESPONSE_URI = "/api/v1";
-	private static final UUID TEST_DTO_1_ID = UUID.randomUUID();
-	private static final String TEST_DTO_1_NAME = "TEST-1";
-	private static final LocalDateTime TEST_DTO_1_DATE_CREATE = LocalDateTime.now(ZoneOffset.UTC);
-	private static final UUID TEST_DTO_2_ID = UUID.randomUUID();
-	private static final String TEST_DTO_2_NAME = "TEST-2";
-	private static final LocalDateTime TEST_DTO_2_DATE_CREATE = LocalDateTime.now(ZoneOffset.UTC);
-	private static final String ERROR_CODE = "TEST_ERROR_CODE";
-	private static final String ERROR_DESCRIPTION = "TEST";
-
-	private final ObjectMapper objectMapper = JsonMapper.builder()
-		.addModule(new JavaTimeModule())
-		.build();
-
+public class ResponseTest extends BaseTest {
 	@Test
 	public void shouldReturnResponseWithDataAs1ObjectWithoutErrorsAndUriSpecified() {
 		final TestDto testDto = buildTestDto1();
@@ -479,67 +461,5 @@ public class ResponseTest {
 
 		assertThat(response.getMeta().getApi().getVersion(), is("1"));
 		assertThat(response.getMeta().getTrace().getId(), is(traceId));
-	}
-
-	private TestDto buildTestDto1() {
-		return new TestDto()
-			.setId(TEST_DTO_1_ID)
-			.setName(TEST_DTO_1_NAME)
-			.setCreateDate(TEST_DTO_1_DATE_CREATE);
-	}
-
-	private TestDto buildTestDto2() {
-		return new TestDto()
-			.setId(TEST_DTO_2_ID)
-			.setName(TEST_DTO_2_NAME)
-			.setCreateDate(TEST_DTO_2_DATE_CREATE);
-	}
-
-	private String buildSelfLink(final @NonNull TestDto testDto) {
-		return buildSelfLink("", testDto);
-	}
-
-	private String buildSelfLink(final @NonNull String uri, final @NonNull TestDto testDto) {
-		return uri + "/" + TestDto.API_TYPE + "/" + testDto.getId();
-	}
-
-	private void assertResponseErrorCode(final @NonNull Response<?> response) {
-		assertThat(response.getErrors().get(0).getCode(), is(ERROR_CODE));
-	}
-
-	private void assertErrorResponse(final @NonNull Response<?> response) {
-		assertThat(response.getData(), nullValue());
-
-		assertThat(response.getErrors().get(0).getStatus(), is(HttpStatus.BAD_REQUEST.value()));
-		assertThat(response.getErrors().get(0).getDetail(), is(ERROR_DESCRIPTION));
-
-		assertThat(response.getMeta().getApi().getVersion(), is("1"));
-		assertThat(response.getMeta().getPage().getMaxSize(), is(25));
-		assertThat(response.getMeta().getPage().getTotal(), is(0L));
-	}
-
-	@SuppressWarnings("unchecked")
-	private void assertThatAttributesIdFieldIsPresentInCollection(final @NonNull Object response) {
-		final Map<String, Object> responseMap = objectMapper.convertValue(response, Map.class);
-
-		((List<Object>)responseMap.get("data")).forEach(dataItem -> {
-			final Object idAttributeField = ((Map<String, Object>)((Map<String, Object>)dataItem)
-				.get("attributes"))
-				.get("id");
-
-			assertThat(idAttributeField, notNullValue());
-		});
-	}
-
-	@SuppressWarnings("unchecked")
-	private void assertThatAttributesIdFieldIsPresentInObject(final @NonNull Object response) {
-		final Map<String, Object> responseMap = objectMapper.convertValue(response, Map.class);
-
-		final Object idAttributeField = ((Map<String, Object>)((Map<String, Object>)responseMap
-			.get("data"))
-			.get("attributes"))
-			.get("id");
-
-		assertThat(idAttributeField, notNullValue());
 	}
 }

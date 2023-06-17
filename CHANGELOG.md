@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.10.1] - 2023-06-17
+### Fixed:
+  - Missing **@NoArgsConstructor** annotation on **Meta** class for proper jackson response deserialization
+
 ## [1.10.0] - 2023-02-21
 ### Changed:
   - Add id field to attributes (more usable for api clients)

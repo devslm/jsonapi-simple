@@ -19,6 +19,7 @@ public class Meta {
     private Trace trace;
 
     @Data
+    @NoArgsConstructor
     @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Page {
