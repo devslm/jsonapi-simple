@@ -92,5 +92,23 @@ public class ResponseDeserializationTest extends BaseTest {
         final Response<Data<TestDto>> deserealizedResponse = objectMapper.readValue(json, objectMapper.getTypeFactory().constructParametricType(Response.class, dataType));
 
         assertErrorResponse(deserealizedResponse);
+
+        assertThat(deserealizedResponse.getErrors().get(0).getMeta(), nullValue());
+    }
+
+    @Test
+    public void shouldDeserializeResponseWithErrorWithMetaAndWithData() throws Exception {
+        final ErrorMetaDto errorMeta = buildTestErrorMeta();
+        final Response<Data<TestDto>> response = Response.<Data<TestDto>, TestDto>builder()
+            .data(buildTestDto1())
+            .error(HttpStatus.BAD_REQUEST, ERROR_CODE, ERROR_DESCRIPTION, new Error.ErrorMeta(errorMeta))
+            .build();
+
+        final String json = objectMapper.writeValueAsString(response);
+        final JavaType dataType = objectMapper.getTypeFactory().constructParametricType(Data.class, TestDto.class);
+        final Response<Data<TestDto>> deserealizedResponse = objectMapper.readValue(json, objectMapper.getTypeFactory().constructParametricType(Response.class, dataType));
+
+        assertErrorResponse(deserealizedResponse);
+        assertResponseErrorMeta(deserealizedResponse, errorMeta);
     }
 }

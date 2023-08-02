@@ -206,7 +206,7 @@ public class ResponseTest extends BaseTest {
 	}
 
 	@Test
-	public void shouldReturnResponseWithErrorWithLinkAndWith() {
+	public void shouldReturnResponseWithErrorWithLinkAndWithEmptyData() {
 		final Error.ErrorLink errorLink = Error.ErrorLink
 			.builder()
 			.about("https://example.org/docs/" + ERROR_CODE)
@@ -219,6 +219,19 @@ public class ResponseTest extends BaseTest {
 		assertErrorResponse(response);
 
 		assertThat(response.getErrors().get(0).getLinks().getAbout(), is(errorLink.getAbout()));
+	}
+
+	@Test
+	public void shouldReturnResponseWithErrorCodeAndMetaAndWithData() {
+		final ErrorMetaDto errorMeta = buildTestErrorMeta();
+		final Response<Data<TestDto>> response = Response.<Data<TestDto>, TestDto>builder()
+			.data(buildTestDto1())
+			.error(HttpStatus.BAD_REQUEST, ERROR_CODE, ERROR_DESCRIPTION, new Error.ErrorMeta(errorMeta))
+			.build();
+
+		assertErrorResponse(response);
+		assertResponseErrorCode(response);
+		assertResponseErrorMeta(response, errorMeta);
 	}
 
 	@Test

@@ -347,6 +347,7 @@ public class Response<T> {
                 "VALIDATION_ERROR",
                 detail,
                 errorValidationField,
+                null,
                 null
             );
         }
@@ -359,7 +360,7 @@ public class Response<T> {
          * @return self link
          */
         public ResponseBuilder<T, V> error(final HttpStatus status, final String detail) {
-            return error(status, null, detail, null, null);
+            return error(status, null, detail, null, null, null);
         }
 
         /**
@@ -371,7 +372,7 @@ public class Response<T> {
          * @return self link
          */
         public ResponseBuilder<T, V> error(final HttpStatus status, final String code, final String detail) {
-            return error(status, code, detail, null, null);
+            return error(status, code, detail, null, null, null);
         }
 
         /**
@@ -390,7 +391,7 @@ public class Response<T> {
                                            final String code,
                                            final @NonNull String detail,
                                            final String errorValidationField) {
-            return error(status, code, detail, errorValidationField, null);
+            return error(status, code, detail, errorValidationField, null, null);
         }
 
         /**
@@ -409,7 +410,47 @@ public class Response<T> {
                                            final String code,
                                            final @NonNull String detail,
                                            final Error.ErrorLink links) {
-            return error(status, code, detail, null, links);
+            return error(status, code, detail, null, links, null);
+        }
+
+        /**
+         * Create errors object.
+         *
+         * <p>We can invoke this method as many times as we need and
+         * result object will contain all errors we passed.
+         *
+         * @param status spring {@link HttpStatus} object
+         * @param code internal error code (if exists)
+         * @param detail detail information about error
+         * @param errorMeta field with meta info for the non-standard details about error
+         * @return self link
+         */
+        public ResponseBuilder<T, V> error(final HttpStatus status,
+                                           final String code,
+                                           final @NonNull String detail,
+                                           final Error.ErrorMeta errorMeta) {
+            return error(status, code, detail, null, null, errorMeta);
+        }
+
+        /**
+         * Create errors object.
+         *
+         * <p>We can invoke this method as many times as we need and
+         * result object will contain all errors we passed.
+         *
+         * @param status spring {@link HttpStatus} object
+         * @param code internal error code (if exists)
+         * @param detail detail information about error
+         * @param links field with links for the details about error
+         * @param errorMeta field with meta info for the non-standard details about error
+         * @return self link
+         */
+        public ResponseBuilder<T, V> error(final HttpStatus status,
+                                           final String code,
+                                           final @NonNull String detail,
+                                           final Error.ErrorLink links,
+                                           final Error.ErrorMeta errorMeta) {
+            return error(status, code, detail, null, links, errorMeta);
         }
 
         /**
@@ -423,13 +464,15 @@ public class Response<T> {
          * @param detail detail information about error
          * @param errorValidationField field with failed validation
          * @param links field with links for the details about error
+         * @param errorMeta field with meta info for the non-standard details about error
          * @return self link
          */
         public ResponseBuilder<T, V> error(final HttpStatus status,
                                            final String code,
                                            final @NonNull String detail,
                                            final String errorValidationField,
-                                           final Error.ErrorLink links) {
+                                           final Error.ErrorLink links,
+                                           final Error.ErrorMeta errorMeta) {
             if (this.errors == null) {
                 this.errors = new ArrayList<>();
             }
@@ -438,8 +481,10 @@ public class Response<T> {
             if (StringUtils.hasText(errorValidationField)) {
                 errorSource = new Error.Source(errorValidationField);
             }
+            final Object errorMetaData = (errorMeta != null ? errorMeta.getMeta() : null);
+
             this.errors.add(
-                new Error(status.value(), code, detail, errorSource, links)
+                new Error(status.value(), code, detail, errorSource, links, errorMetaData)
             );
             this.dataList = null;
             this.dataObject = null;

@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.11.0] - 2023-08-02
+### Added:
+  - Error meta field for meta object containing non-standard meta-information about the error
+
 ## [1.10.1] - 2023-06-17
 ### Fixed:
   - Missing **@NoArgsConstructor** annotation on **Meta** class for proper jackson response deserialization

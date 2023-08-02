@@ -3,6 +3,9 @@ package com.slmdev.jsonapi.simple.response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 
@@ -10,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -56,6 +60,14 @@ abstract class BaseTest {
         assertThat(response.getErrors().get(0).getCode(), is(ERROR_CODE));
     }
 
+    protected void assertResponseErrorMeta(final @NonNull Response<?> response, final @NonNull ErrorMetaDto requiredErrorMeta) {
+        final ErrorMetaDto errorMeta = objectMapper.convertValue(response.getErrors().get(0).getMeta(), ErrorMetaDto.class);
+
+        assertThat(errorMeta.getId(), is(requiredErrorMeta.getId()));
+        assertThat(errorMeta.getValue(), is(requiredErrorMeta.getValue()));
+        assertThat(errorMeta.getCodes().size(), is(2));
+    }
+
     protected void assertErrorResponse(final @NonNull Response<?> response) {
         assertThat(response.getData(), nullValue());
 
@@ -90,5 +102,25 @@ abstract class BaseTest {
             .get("id");
 
         assertThat(idAttributeField, notNullValue());
+    }
+
+    protected ErrorMetaDto buildTestErrorMeta() {
+        return new ErrorMetaDto(
+            UUID.randomUUID(),
+            "Test meta value",
+            Set.of(
+                "Value 1",
+                "Value 2"
+            )
+        );
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    protected static class ErrorMetaDto {
+        private UUID id;
+        private String value;
+        private Set<String> codes;
     }
 }

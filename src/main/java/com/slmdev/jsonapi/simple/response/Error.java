@@ -20,7 +20,10 @@ public class Error {
     private String detail;
     @ApiModelProperty(value = "Parameter name only for validation errors")
     private Source source;
+    @ApiModelProperty(value = "Links object can be used to represent links")
     private ErrorLink links;
+    @ApiModelProperty(value = "Meta object containing non-standard meta-information about the error")
+    private Object meta;
 
     @Getter
     @ToString
@@ -29,6 +32,7 @@ public class Error {
     @Accessors(chain = true)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Source {
+        @ApiModelProperty(value = "Object containing references to the primary source of the error")
         private String parameter;
     }
 
@@ -44,5 +48,15 @@ public class Error {
         private String about;
         @ApiModelProperty(value = "A link that identifies the type of error that this particular error is an instance of")
         private String type;
+    }
+    @Getter
+    @ToString
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Accessors(chain = true)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class ErrorMeta {
+        private Object meta;
     }
 }

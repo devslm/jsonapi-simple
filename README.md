@@ -506,6 +506,58 @@ public class Test {
 }
 ```
 
+Example response with error with meta field (data is empty so we use ```Void```class as generic parameter):
+```java
+// Pseudo code
+public class Test {
+    public Response<Void> main() {
+        final ErrorMetaDto errorMeta = new ErrorMetaDto(
+            UUID.randomUUID(),
+            "Test meta value",
+            Set.of(
+                "Value 1",
+                "Value 2"
+            )
+        );
+        return Response.<Void, Void>builder()
+            .error(
+                HttpStatus.BAD_REQUEST,
+                "20045",
+                "Some errors occurred!",
+                errorMeta
+            ).build();
+    }
+}
+```
+```json
+{
+    "errors": [
+        {
+            "status": 400,
+            "code": "20045",
+            "detail": "Some errors occurred!",
+            "meta": {
+                "id": UUID,
+                "value": "Test meta value",
+                "codes": [
+                    "Value 1",
+                    "Value 2"
+                ]
+            }
+        }
+    ],
+    "meta": {
+        "api": {
+            "version": "1"
+        },
+        "page": {
+            "maxSize": 25,
+            "total": 0
+        }
+    }
+}
+```
+
 Example response with error with links (data is empty, so we use ```Void``` class as generic parameter):
 ```java
 // Pseudo code
