@@ -537,7 +537,7 @@ public class Test {
             "code": "20045",
             "detail": "Some errors occurred!",
             "meta": {
-                "id": UUID,
+                "id": "7a543e90-2961-480e-b1c4-51249bf0c566",
                 "value": "Test meta value",
                 "codes": [
                     "Value 1",
