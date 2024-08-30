@@ -1,12 +1,10 @@
 package com.slmdev.jsonapi.simple.annotation;
 
-import org.springframework.data.domain.Pageable;
-
 import java.lang.annotation.*;
 
 /**
  * The annotation extract page fields from request and
- * store them in the {@link Pageable} object.
+ * store them in the {@link org.springframework.data.domain.Pageable} object.
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)

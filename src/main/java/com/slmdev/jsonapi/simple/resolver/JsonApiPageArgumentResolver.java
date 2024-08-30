@@ -3,6 +3,9 @@ package com.slmdev.jsonapi.simple.resolver;
 import com.slmdev.jsonapi.simple.annotation.RequestJsonApiPage;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -30,12 +33,13 @@ public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolve
         return parameter.getParameterAnnotation(RequestJsonApiPage.class) != null;
     }
 
-    public Object resolveArgument(final MethodParameter methodParameter,
-                                  final ModelAndViewContainer modelAndViewContainer,
-                                  final NativeWebRequest nativeWebRequest,
-                                  final WebDataBinderFactory webDataBinderFactory) {
+    public Pageable resolveArgument(final MethodParameter methodParameter,
+                                    final ModelAndViewContainer modelAndViewContainer,
+                                    final NativeWebRequest nativeWebRequest,
+                                    final WebDataBinderFactory webDataBinderFactory) {
         final RequestJsonApiPage RequestJsonApiPage = methodParameter.getParameterAnnotation(RequestJsonApiPage.class);
         final String pageKeyStart = RequestJsonApiPage.name() + REQUEST_PAGE_KEY_BRACKET_START;
+        final Sort sort = parseSortField(nativeWebRequest);
         int page = 0;
         int size = 25;
 
@@ -75,6 +79,10 @@ public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolve
         if (size < 1) {
             size = 25;
         }
+
+        if (sort != null) {
+            return PageRequest.of(page, size, sort);
+        }
         return PageRequest.of(page, size);
     }
 
@@ -91,5 +99,22 @@ public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolve
             }).forEach(valueItems::addAll);
 
         return valueItems;
+    }
+
+    private Sort parseSortField(final NativeWebRequest nativeWebRequest) {
+        if (CollectionUtils.isEmpty(nativeWebRequest.getParameterMap())
+                || nativeWebRequest.getParameterMap().get("sort") == null) {
+            return null;
+        }
+        final var sortOrders = Arrays.stream(nativeWebRequest.getParameterMap()
+            .get("sort"))
+            .map(field -> {
+                if (!field.startsWith("-")) {
+                    return Sort.Order.asc(field);
+                }
+                return Sort.Order.desc(field.substring(1));
+            }).collect(Collectors.toList());
+
+        return Sort.by(sortOrders);
     }
 }

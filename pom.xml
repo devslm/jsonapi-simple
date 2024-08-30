@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.slm-dev</groupId>
 	<artifactId>jsonapi-simple</artifactId>
-	<version>1.11.0</version>
+	<version>1.12.0</version>
 	<name>jsonapi-simple</name>
 	<description>Simple implementation of the JSON:API specification</description>
 	<url>https://slm-dev.com/jsonapi-simple/</url>
@@ -35,23 +35,20 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
-		<spring.web.version>5.3.25</spring.web.version>
-		<spring.data.commons.version>2.7.8</spring.data.commons.version>
-		<lombok.version>1.18.26</lombok.version>
-		<lombok.maven.plugin.version>1.18.20.0</lombok.maven.plugin.version>
-		<jackson.version>2.14.2</jackson.version>
-		<jackson.datatype.version>2.14.2</jackson.datatype.version>
-		<springfox.version>3.0.0</springfox.version>
-		<junit.version>5.9.2</junit.version>
-		<hamcrest.version>2.2</hamcrest.version>
-		<mockito.version>5.1.1</mockito.version>
-		<maven.compiler.version>3.10.1</maven.compiler.version>
-		<maven.surefire.version>2.22.2</maven.surefire.version>
-		<maven.deploy.version>2.8.2</maven.deploy.version>
-		<nexus.staging.maven.version>1.6.13</nexus.staging.maven.version>
-		<maven.source.version>3.2.1</maven.source.version>
-		<maven.javadoc.version>3.5.0</maven.javadoc.version>
-		<maven.gpg.version>3.0.1</maven.gpg.version>
+		<spring.web.version>5.3.39</spring.web.version>
+		<spring.data.commons.version>2.7.18</spring.data.commons.version>
+		<lombok.version>1.18.34</lombok.version>
+		<jackson.version>2.16.2</jackson.version>
+		<jackson.datatype.version>2.16.2</jackson.datatype.version>
+		<springdoc.openapi.version>2.6.0</springdoc.openapi.version>
+		<junit.version>5.11.0</junit.version>
+		<hamcrest.version>3.0</hamcrest.version>
+		<mockito.version>5.13.0</mockito.version>
+		<maven.compiler.version>3.13.0</maven.compiler.version>
+		<maven.surefire.version>3.5.0</maven.surefire.version>
+		<nexus.staging.maven.version>1.7.0</nexus.staging.maven.version>
+		<maven.source.version>3.3.1</maven.source.version>
+		<maven.javadoc.version>3.10.0</maven.javadoc.version>
 	</properties>
 
 	<dependencies>
@@ -86,9 +83,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-			<version>${springfox.version}</version>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${springdoc.openapi.version}</version>
 		</dependency>
 
 		<dependency>
@@ -111,45 +108,9 @@
 			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok-maven-plugin</artifactId>
-			<version>${lombok.maven.plugin.version}</version>
-		</dependency>
 	</dependencies>
 
 	<profiles>
-		<profile>
-			<id>delombok</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.projectlombok</groupId>
-						<artifactId>lombok-maven-plugin</artifactId>
-						<version>${lombok.maven.plugin.version}</version>
-						<executions>
-							<execution>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>delombok</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<sourceDirectory>src/main/java/com/slmdev/jsonapi/simple</sourceDirectory>
-							<verbose>true</verbose>
-							<formatPreferences>
-								<generateDelombokComment>skip</generateDelombokComment>
-								<javaLangAsFQN>skip</javaLangAsFQN>
-								<suppressWarnings>skip</suppressWarnings>
-							</formatPreferences>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
 		<profile>
 			<id>release</id>
 			<build>
@@ -200,7 +161,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>${maven.gpg.version}</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>

@@ -9,16 +9,19 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNotNull;
 
-public class PageTest {
+public class PageTest extends BaseTest {
     private static final String REQUEST_PAGE_ARGUMENT_NAME = "page";
     private static final String REQUEST_PAGE_NUMBER_KEY = "number";
     private static final String REQUEST_PAGE_SIZE_KEY = "size";
@@ -93,6 +96,10 @@ public class PageTest {
     }
 
     private void shouldParsePageWithSizeAndPage(int pageNumber, int size) {
+        shouldParsePageWithSizeAndPageAndSort(pageNumber, size, Optional.empty());
+    }
+
+    private void shouldParsePageWithSizeAndPageAndSort(int pageNumber, int size, Optional<Sort> sort) {
         final Map<String, String[]> pageParams = new HashMap<>();
         final int requiredPageNumber = (pageNumber > 0 ? pageNumber - 1 : 0);
 
@@ -106,7 +113,7 @@ public class PageTest {
         Mockito.when(nativeWebRequest.getParameterMap())
             .thenReturn(pageParams);
 
-        final Pageable page = (Pageable)jsonApiPageArgumentResolver.resolveArgument(methodParameter, null, nativeWebRequest, null);
+        final Pageable page = jsonApiPageArgumentResolver.resolveArgument(methodParameter, null, nativeWebRequest, null);
 
         if (pageNumber != Integer.MIN_VALUE) {
             assertThat(page.getPageNumber(), is(requiredPageNumber));
@@ -119,5 +126,9 @@ public class PageTest {
         } else {
             assertThat(page.getPageSize(), is(DEFAULT_PAGE_SIZE));
         }
+        sort.ifPresentOrElse(
+            (value) -> assertThat(value, isNotNull()),
+            () -> assertThat(page.getSort(), is(Sort.unsorted()))
+        );
     }
 }

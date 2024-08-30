@@ -1,7 +1,7 @@
 package com.slmdev.jsonapi.simple.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,13 +23,13 @@ public class Meta {
     @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Page {
-        @ApiModelProperty(value = "Page size", required = true)
+        @Schema(description = "Page size", requiredMode = Schema.RequiredMode.REQUIRED)
         private int maxSize;
-        @ApiModelProperty(value = "Total number data objects", required = true)
+        @Schema(description = "Total number data objects", requiredMode = Schema.RequiredMode.REQUIRED)
         private long total;
-        @ApiModelProperty("Link to the previous page if exist")
+        @Schema(description = "Link to the previous page if exist")
         private String prev;
-        @ApiModelProperty("Link to the next page if exist")
+        @Schema(description = "Link to the next page if exist")
         private String next;
     }
 
@@ -38,7 +38,7 @@ public class Meta {
     @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class WebSocket {
-        @ApiModelProperty("Websocket session id")
+        @Schema(description = "Websocket session id")
         private UUID sessionId;
     }
 
@@ -57,7 +57,7 @@ public class Meta {
             this.id = id.toString();
         }
 
-        @ApiModelProperty("Trace id (any string identifier, ie request id)")
+        @Schema(description = "Trace id (any string identifier, ie request id)")
         private String id;
     }
 }

@@ -1,7 +1,7 @@
 package com.slmdev.jsonapi.simple.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -12,17 +12,17 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Error {
-    @ApiModelProperty(value = "Response HTTP code", required = true)
+    @Schema(description = "Response HTTP code", requiredMode = Schema.RequiredMode.REQUIRED)
     private int status;
-    @ApiModelProperty("Application specific error code")
+    @Schema(description = "Application specific error code")
     private String code;
-    @ApiModelProperty(value = "Error detail message", required = true)
+    @Schema(description = "Error detail message", requiredMode = Schema.RequiredMode.REQUIRED)
     private String detail;
-    @ApiModelProperty(value = "Parameter name only for validation errors")
+    @Schema(description = "Parameter name only for validation errors")
     private Source source;
-    @ApiModelProperty(value = "Links object can be used to represent links")
+    @Schema(description = "Links object can be used to represent links")
     private ErrorLink links;
-    @ApiModelProperty(value = "Meta object containing non-standard meta-information about the error")
+    @Schema(description = "Meta object containing non-standard meta-information about the error")
     private Object meta;
 
     @Getter
@@ -32,7 +32,7 @@ public class Error {
     @Accessors(chain = true)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Source {
-        @ApiModelProperty(value = "Object containing references to the primary source of the error")
+        @Schema(description = "Object containing references to the primary source of the error")
         private String parameter;
     }
 
@@ -44,9 +44,9 @@ public class Error {
     @Accessors(chain = true)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class ErrorLink {
-        @ApiModelProperty(value = "A link that leads to further details about this particular occurrence of the problem")
+        @Schema(description = "A link that leads to further details about this particular occurrence of the problem")
         private String about;
-        @ApiModelProperty(value = "A link that identifies the type of error that this particular error is an instance of")
+        @Schema(description = "A link that identifies the type of error that this particular error is an instance of")
         private String type;
     }
     @Getter

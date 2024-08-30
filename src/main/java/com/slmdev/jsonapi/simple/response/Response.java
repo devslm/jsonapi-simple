@@ -3,7 +3,7 @@ package com.slmdev.jsonapi.simple.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.slmdev.jsonapi.simple.annotation.JsonApiId;
 import com.slmdev.jsonapi.simple.annotation.JsonApiType;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -40,18 +40,23 @@ import java.util.UUID;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response<T> {
-    @ApiModelProperty("Response data if no errors")
+    @Schema(description = "Response data if no errors", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     protected T data;
-    @ApiModelProperty("Response errors if exists, data field will be absent")
+    @Schema(
+        description = "Response errors if exists, data field will be absent",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED
+    )
     protected List<Error> errors;
-    @ApiModelProperty(value = "Any additional information such as api version, pagination and etc.", required = true)
+    @Schema(
+        description = "Any additional information such as api version, pagination and etc.",
+        requiredMode = Schema.RequiredMode.REQUIRED
+    )
     protected Meta meta;
 
     /**
      * Builder that construct response entity in JSON API format.
      *
-     * <p>Each response entity must contain annotations: {@link JsonApiType} and
-     * {@link JsonApiId}.
+     * <p>Each response entity must contain annotations: {@link JsonApiType} and {@link JsonApiId}.
      * {@link JsonApiType} on the class describe the type of the entity and {@link JsonApiId}
      * describe id of this entity
      * (see: <a href="https://jsonapi.org/format/#document-resource-object-identification">document-resource-object-identification</a>).

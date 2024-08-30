@@ -8,7 +8,7 @@ websockets, queues etc and don't need complex entities inner relationships in ou
 exists standards so this library for this goals.
 
 ## Docs
-[See project page](https://slm-dev.com/jsonapi-simple/)
+[See project page](https://devslm.github.io/jsonapi-simple/)
 
 ## Usage
 Add dependency to your project:
@@ -16,12 +16,20 @@ Add dependency to your project:
 <dependency>
     <groupId>com.slm-dev</groupId>
     <artifactId>jsonapi-simple</artifactId>
-    <version>1.11.0</version>
+    <version>1.12.0</version>
 </dependency>
 ```
 
 > **Warning:**
 > The id field is included in the attributes because it more convenient for API clients.
+
+### Navigation
+  - [Build Response](#build-response)
+  - [Filtering](#filtering)
+  - [Sparse fieldsets](#sparse-fieldsets)
+  - [Pagination](#pagination)
+  - [Sorting](#sorting)
+  - [Examples](#other-response-examples)
 
 ### Build Response
 
@@ -34,17 +42,17 @@ field is ```id```.
 If we want to use data types like lists, maps etc. in the response we can set manually data type to avoid exception 
 (see example below). 
 
-Each response may contain generics (if you planning to use SWAGGER) or may not (without SWAGGER), for example both 
+Each response may contain generics (if you planning to use OPENAPI) or may not (without OPENAPI), for example both 
 variants correct:
 ```java
 public class RestController {
-    // The simplest option without SWAGGER support
+    // The simplest option without OPENAPI support
     public Response responseWithoutGenerics() {
         return Response.builder()
            .build();
     }
   
-    // This option will display correctly in SWAGGER with all DTO fields 
+    // This option will display correctly in OPENAPI with all DTO fields 
     public Response<SomeDto> responseWithGenerics() {
         return Response.<SomeDto, SomeDto>builder()
            .build();
@@ -348,6 +356,39 @@ And for the page size are:
 
 #### Request page always starts from 0 for compatible with spring repositories and etc.!
 #### If request page number < 1 resolver always return number = 0 and if size < 1 it always returns default value = 25!
+
+### Sorting
+
+See documentation part: [fetching-sorting](https://jsonapi.org/format/#fetching-sorting)
+
+If you want to use request sort with annotation ```@RequestJsonApiPage``` add argument resolver in your configuration
+as described in section [Pagination](#pagination).
+
+Then you can use annotation ```@RequestJsonApiPage``` in controllers and get standard spring Pageable object.
+
+For example:
+```java
+@Slf4j
+@RestController
+@AllArgsConstructor
+@RequestMapping(value = "/app", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class RestController {
+    @GetMapping
+    public Response<Void> get(final @RequestJsonApiPage Pageable page) throws Exception {
+        final Sort sort = page.getSort();
+        // do anything with sort
+        
+        return Response.<Void, Void>builder()
+            .build();
+    }
+}
+```
+
+Now if request will be contained list of fields like ```sort=field1,field2,-field3``` we can get them in the ```Pageable``` object.
+
+For ASC order we just put fields name as is, for example: ```sort=name,age,...``` (see JSON:API spec).
+
+For DESC order we should put fields name with prefix **-**, for example: ```sort=-name,age,...``` (see JSON:API spec).
 
 ### Other response examples
 Example response with one data object:
