@@ -1,9 +1,11 @@
 # Changelog
 
 ## [1.12.0] - 2024-08-30
+### Added:
+- Support for sort field
+
 ### Changed:
   - Update all dependencies
-  - Add support for sort field
   - Replace **springfox-swagger** with the **springdoc-openapi-starter-webmvc-ui** dependency
 
 ## [1.11.0] - 2023-08-02
