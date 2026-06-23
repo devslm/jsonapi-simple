@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import java.util.HashMap;
@@ -18,7 +19,6 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
 
 public class PageSortTest extends BaseTest {
     private static final String REQUEST_PAGE_ARGUMENT_NAME = "page";
@@ -43,8 +43,10 @@ public class PageSortTest extends BaseTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        Mockito.when(methodParameter.getParameterAnnotation(any()))
+        Mockito.when(methodParameter.getParameterAnnotation(RequestJsonApiPage.class))
             .thenReturn(requestJsonApiPage);
+        Mockito.when(methodParameter.getParameterAnnotation(PageableDefault.class))
+            .thenReturn(null);
         Mockito.when(requestJsonApiPage.name())
             .thenReturn(REQUEST_PAGE_ARGUMENT_NAME);
 

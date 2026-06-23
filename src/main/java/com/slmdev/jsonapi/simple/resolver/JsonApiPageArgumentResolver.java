@@ -5,6 +5,8 @@ import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -21,7 +23,10 @@ import java.util.stream.Stream;
  * <p>By default using {@code page} param name and key names in square brackets,
  * for example {@code page[number]=3&page[size]=15}.
  *
- * After parsing will be created new spring {@link org.springframework.data.domain.Pageable} object.
+ * Optionally, if provided with a {@link org.springframework.data.web.PageableDefault}, it uses those
+ * values as the defaults when parsing the request parameters.
+ *
+ * After the parsing, a new spring {@link org.springframework.data.domain.Pageable} object will be created.
  *
  * <p>This resolver must be registered in Spring application.
  */
@@ -37,11 +42,12 @@ public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolve
                                     final ModelAndViewContainer modelAndViewContainer,
                                     final NativeWebRequest nativeWebRequest,
                                     final WebDataBinderFactory webDataBinderFactory) {
-        final RequestJsonApiPage RequestJsonApiPage = methodParameter.getParameterAnnotation(RequestJsonApiPage.class);
-        final String pageKeyStart = RequestJsonApiPage.name() + REQUEST_PAGE_KEY_BRACKET_START;
-        final Sort sort = parseSortField(nativeWebRequest);
-        int page = 0;
-        int size = 25;
+        final RequestJsonApiPage requestJsonApiPage = methodParameter.getParameterAnnotation(RequestJsonApiPage.class);
+        final PageableDefault pageableDefault = methodParameter.getParameterAnnotation(PageableDefault.class);
+        final String pageKeyStart = requestJsonApiPage.name() + REQUEST_PAGE_KEY_BRACKET_START;
+        final Sort sort = parseSortField(nativeWebRequest, pageableDefault);
+        int page = pageableDefault == null ?  0 : pageableDefault.page();
+        int size = pageableDefault == null ? 10 : pageableDefault.size();
 
         final List<Map.Entry<String, String[]>> entries = nativeWebRequest.getParameterMap()
             .entrySet()
@@ -101,10 +107,16 @@ public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolve
         return valueItems;
     }
 
-    private Sort parseSortField(final NativeWebRequest nativeWebRequest) {
+    private Sort parseSortField(final NativeWebRequest nativeWebRequest, @Nullable final PageableDefault pageableDefault) {
         if (CollectionUtils.isEmpty(nativeWebRequest.getParameterMap())
                 || nativeWebRequest.getParameterMap().get("sort") == null) {
+
+            if (pageableDefault != null && pageableDefault.sort().length > 0) {
+                return Sort.by(pageableDefault.direction(), pageableDefault.sort());
+            }
+
             return null;
+
         }
         final var sortOrders = Arrays.stream(nativeWebRequest.getParameterMap()
             .get("sort"))

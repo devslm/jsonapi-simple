@@ -355,7 +355,8 @@ And for the page size are:
   - **page[limit]**
 
 #### Request page always starts from 0 for compatible with spring repositories and etc.!
-#### If request page number < 1 resolver always return number = 0 and if size < 1 it always returns default value = 25!
+#### If request page number < 1 resolver always return number = 0 and if size < 1 it always returns default value = 10!
+#### Those default values can be overridden by annotating the method parameter with ```@PageableDefault```
 
 ### Sorting
 
