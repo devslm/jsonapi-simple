@@ -5,12 +5,13 @@ import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableArgumentResolver;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.util.*;
@@ -30,7 +31,7 @@ import java.util.stream.Stream;
  *
  * <p>This resolver must be registered in Spring application.
  */
-public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolver {
+public class JsonApiPageArgumentResolver implements PageableArgumentResolver {
     private static final String REQUEST_PAGE_KEY_BRACKET_START = "[";
     private static final String REQUEST_PAGE_KEY_BRACKET_END = "]";
 
@@ -38,6 +39,8 @@ public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolve
         return parameter.getParameterAnnotation(RequestJsonApiPage.class) != null;
     }
 
+    @NonNull
+    @Override
     public Pageable resolveArgument(final MethodParameter methodParameter,
                                     final ModelAndViewContainer modelAndViewContainer,
                                     final NativeWebRequest nativeWebRequest,
