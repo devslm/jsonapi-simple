@@ -137,6 +137,7 @@ public class JsonApiPageArgumentResolver implements PageableArgumentResolver {
         return valueItems;
     }
 
+    @Nullable
     private Sort parseSortField(
         final NativeWebRequest nativeWebRequest,
         @Nullable final SortDefault sortDefault,
