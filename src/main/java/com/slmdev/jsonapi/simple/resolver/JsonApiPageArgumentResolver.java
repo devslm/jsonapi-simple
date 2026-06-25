@@ -1,12 +1,21 @@
 package com.slmdev.jsonapi.simple.resolver;
 
-import com.slmdev.jsonapi.simple.annotation.RequestJsonApiPage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableArgumentResolver;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
+import org.springframework.data.web.SortDefault.SortDefaults;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
@@ -14,9 +23,7 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.slmdev.jsonapi.simple.annotation.RequestJsonApiPage;
 
 /**
  * Spring resolver using for extract page values from the request.
@@ -36,7 +43,8 @@ public class JsonApiPageArgumentResolver implements PageableArgumentResolver {
     private static final String REQUEST_PAGE_KEY_BRACKET_END = "]";
 
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(RequestJsonApiPage.class) != null;
+        return Pageable.class.equals(parameter.getParameterType()) &&
+               parameter.getParameterAnnotation(RequestJsonApiPage.class) != null;
     }
 
     @NonNull
@@ -45,10 +53,29 @@ public class JsonApiPageArgumentResolver implements PageableArgumentResolver {
                                     final ModelAndViewContainer modelAndViewContainer,
                                     final NativeWebRequest nativeWebRequest,
                                     final WebDataBinderFactory webDataBinderFactory) {
-        final RequestJsonApiPage requestJsonApiPage = methodParameter.getParameterAnnotation(RequestJsonApiPage.class);
+
+        final SortDefault sortDefault = methodParameter.getParameterAnnotation(SortDefault.class);
+        final SortDefaults sortDefaults = methodParameter.getParameterAnnotation(SortDefaults.class);
         final PageableDefault pageableDefault = methodParameter.getParameterAnnotation(PageableDefault.class);
+
+        if (sortDefault != null && sortDefaults != null) {
+            throw new IllegalArgumentException(
+                String.format(
+                    "Cannot use both @%s and @%s on parameter %s; Move %s into %s to define sorting order",
+                    SortDefaults.class.getSimpleName(),
+                    SortDefault.class.getSimpleName(),
+                    methodParameter.toString(),
+                    SortDefault.class.getSimpleName(),
+                    SortDefaults.class.getSimpleName()
+                )
+            );
+        }
+
+        final RequestJsonApiPage requestJsonApiPage = methodParameter.getParameterAnnotation(RequestJsonApiPage.class);
+
         final String pageKeyStart = requestJsonApiPage.name() + REQUEST_PAGE_KEY_BRACKET_START;
-        final Sort sort = parseSortField(nativeWebRequest, pageableDefault);
+
+        final Sort sort = parseSortField(nativeWebRequest, sortDefault, sortDefaults, pageableDefault);
         int page = pageableDefault == null ?  0 : pageableDefault.page();
         int size = pageableDefault == null ? 10 : pageableDefault.size();
 
@@ -110,11 +137,36 @@ public class JsonApiPageArgumentResolver implements PageableArgumentResolver {
         return valueItems;
     }
 
-    private Sort parseSortField(final NativeWebRequest nativeWebRequest, @Nullable final PageableDefault pageableDefault) {
+    private Sort parseSortField(
+        final NativeWebRequest nativeWebRequest,
+        @Nullable final SortDefault sortDefault,
+        @Nullable final SortDefaults sortDefaults,
+        @Nullable final PageableDefault pageableDefault
+    ) {
+
         if (CollectionUtils.isEmpty(nativeWebRequest.getParameterMap())
                 || nativeWebRequest.getParameterMap().get("sort") == null) {
 
-            if (pageableDefault != null && pageableDefault.sort().length > 0) {
+            SortDefault[] sortDefaultArray =
+                sortDefaults != null ?
+                    sortDefaults.value() :
+                    sortDefault != null ?
+                        new SortDefault[]{sortDefault} :
+                        new SortDefault[0];
+
+            // Takes the sort from sortDefalt(s)
+            if (sortDefaultArray.length > 0) {
+                return Arrays.stream(sortDefaultArray).map(
+                    currentSortDefault -> Sort.by(
+                        currentSortDefault.direction(),
+                        currentSortDefault.sort()
+                    )
+                ).reduce(
+                    Sort.unsorted(),
+                    Sort::and
+                );
+            // Takes the sort from pageableDefault
+            } else if (pageableDefault != null && pageableDefault.sort().length > 0) {
                 return Sort.by(pageableDefault.direction(), pageableDefault.sort());
             }
 

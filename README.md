@@ -354,18 +354,18 @@ And for the page size are:
   - **page[size]**
   - **page[limit]**
 
-#### Request page always starts from 0 for compatible with spring repositories and etc.!
-#### If request page number < 1 resolver always return number = 0 and if size < 1 it always returns default value = 10!
+#### Request page always starts from 0 for compatibility with spring repositories and etc.!
+#### If request page number < 1, resolver always return number = 0, and if size < 1, it always returns default value of 10!
 #### Those default values can be overridden by annotating the method parameter with ```@PageableDefault```
 
 ### Sorting
 
 See documentation part: [fetching-sorting](https://jsonapi.org/format/#fetching-sorting)
 
-If you want to use request sort with annotation ```@RequestJsonApiPage``` add argument resolver in your configuration
+If you want to use request sort with annotation ```@RequestJsonApiPage```, add the argument resolver in your configuration
 as described in section [Pagination](#pagination).
 
-Then you can use annotation ```@RequestJsonApiPage``` in controllers and get standard spring Pageable object.
+Then you can use the annotation ```@RequestJsonApiPage``` in controllers and get a standard spring Pageable object.
 
 For example:
 ```java
@@ -385,11 +385,77 @@ public class RestController {
 }
 ```
 
-Now if request will be contained list of fields like ```sort=field1,field2,-field3``` we can get them in the ```Pageable``` object.
+Now if the request contains a list of fields like ```sort=field1,field2,-field3``` we can get them in the ```Pageable``` object.
 
 For ASC order we just put fields name as is, for example: ```sort=name,age,...``` (see JSON:API spec).
 
 For DESC order we should put fields name with prefix **-**, for example: ```sort=-name,age,...``` (see JSON:API spec).
+
+To provide a default sort in case the request doesn't specify one, you can use either the one of the ```@SortDefault``` or
+```@SortDefaults``` annotations, or the property **sort** and **direction** of the ```@PageableDefault```
+annotation. See the examples bellow:
+
+```java
+@Slf4j
+@RestController
+@AllArgsConstructor
+@RequestMapping(value = "/app", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class RestController {
+    @GetMapping
+    public Response<Void> get(
+      @sortDefault(sort={"name", "age"}, direction=Sort.Direction.ASC)
+      final @RequestJsonApiPage Pageable page) throws Exception {
+        final Sort sort = page.getSort();
+        // do anything with sort
+        
+        return Response.<Void, Void>builder()
+            .build();
+    }
+}
+```
+
+```java
+@Slf4j
+@RestController
+@AllArgsConstructor
+@RequestMapping(value = "/app", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class RestController {
+    @GetMapping
+    public Response<Void> get(
+      @SortDefault.SortDefaults({
+        @SortDefault({sort={"name", "age"}, direction=Sort.Direction.ASC),
+        @SortDefault({sort={"updateAt"}, direction=Sort.Direction.DESC)
+      })
+      final @RequestJsonApiPage Pageable page) throws Exception {
+        final Sort sort = page.getSort();
+        // do anything with sort
+        
+        return Response.<Void, Void>builder()
+            .build();
+    }
+}
+```
+
+```java
+@Slf4j
+@RestController
+@AllArgsConstructor
+@RequestMapping(value = "/app", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class RestController {
+    @GetMapping
+    public Response<Void> get(
+      @PageableDefault(
+        sort={"name", "age"}, direction=Sort.Direction.ASC
+      )
+      final @RequestJsonApiPage Pageable page) throws Exception {
+        final Sort sort = page.getSort();
+        // do anything with sort
+        
+        return Response.<Void, Void>builder()
+            .build();
+    }
+}
+```
 
 ### Other response examples
 Example response with one data object:
