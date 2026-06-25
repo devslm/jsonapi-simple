@@ -423,8 +423,8 @@ public class RestController {
     @GetMapping
     public Response<Void> get(
       @SortDefault.SortDefaults({
-        @SortDefault({sort={"name", "age"}, direction=Sort.Direction.ASC),
-        @SortDefault({sort={"updateAt"}, direction=Sort.Direction.DESC)
+        @SortDefault(sort={"name", "age"}, direction=Sort.Direction.ASC),
+        @SortDefault(sort={"updateAt"}, direction=Sort.Direction.DESC)
       })
       final @RequestJsonApiPage Pageable page) throws Exception {
         final Sort sort = page.getSort();
