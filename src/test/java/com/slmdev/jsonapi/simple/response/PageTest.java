@@ -1,7 +1,13 @@
 package com.slmdev.jsonapi.simple.response;
 
-import com.slmdev.jsonapi.simple.annotation.RequestJsonApiPage;
-import com.slmdev.jsonapi.simple.resolver.JsonApiPageArgumentResolver;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.isNotNull;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -10,27 +16,22 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.context.request.NativeWebRequest;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isNotNull;
+import com.slmdev.jsonapi.simple.annotation.RequestJsonApiPage;
+import com.slmdev.jsonapi.simple.resolver.JsonApiPageArgumentResolver;
 
 public class PageTest extends BaseTest {
     private static final String REQUEST_PAGE_ARGUMENT_NAME = "page";
     private static final String REQUEST_PAGE_NUMBER_KEY = "number";
     private static final String REQUEST_PAGE_SIZE_KEY = "size";
     private static final int DEFAULT_PAGE_NUMBER = 0;
-    private static final int DEFAULT_PAGE_SIZE = 25;
+    private static final int DEFAULT_PAGE_SIZE = 10;
     private static final int TEST_PAGE_NUMBER_1 = 1;
     private static final int TEST_PAGE_NUMBER_2 = 2;
     private static final int TEST_PAGE_SIZE_10 = 10;
-    private static final int TEST_PAGE_SIZE_25 = DEFAULT_PAGE_SIZE;
+    private static final int TEST_PAGE_SIZE_25 = 25;
 
     private JsonApiPageArgumentResolver jsonApiPageArgumentResolver;
 
@@ -45,8 +46,10 @@ public class PageTest extends BaseTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        Mockito.when(methodParameter.getParameterAnnotation(any()))
+        Mockito.when(methodParameter.getParameterAnnotation(RequestJsonApiPage.class))
             .thenReturn(requestJsonApiPage);
+        Mockito.when(methodParameter.getParameterAnnotation(PageableDefault.class))
+            .thenReturn(null);
         Mockito.when(requestJsonApiPage.name())
             .thenReturn(REQUEST_PAGE_ARGUMENT_NAME);
 

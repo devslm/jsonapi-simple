@@ -1,19 +1,29 @@
 package com.slmdev.jsonapi.simple.resolver;
 
-import com.slmdev.jsonapi.simple.annotation.RequestJsonApiPage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableArgumentResolver;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
+import org.springframework.data.web.SortDefault.SortDefaults;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.slmdev.jsonapi.simple.annotation.RequestJsonApiPage;
 
 /**
  * Spring resolver using for extract page values from the request.
@@ -21,27 +31,53 @@ import java.util.stream.Stream;
  * <p>By default using {@code page} param name and key names in square brackets,
  * for example {@code page[number]=3&page[size]=15}.
  *
- * After parsing will be created new spring {@link org.springframework.data.domain.Pageable} object.
+ * Optionally, if provided with a {@link org.springframework.data.web.PageableDefault}, it uses those
+ * values as the defaults when parsing the request parameters.
+ *
+ * After the parsing, a new spring {@link org.springframework.data.domain.Pageable} object will be created.
  *
  * <p>This resolver must be registered in Spring application.
  */
-public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolver {
+public class JsonApiPageArgumentResolver implements PageableArgumentResolver {
     private static final String REQUEST_PAGE_KEY_BRACKET_START = "[";
     private static final String REQUEST_PAGE_KEY_BRACKET_END = "]";
 
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(RequestJsonApiPage.class) != null;
+        return Pageable.class.equals(parameter.getParameterType()) &&
+               parameter.getParameterAnnotation(RequestJsonApiPage.class) != null;
     }
 
+    @NonNull
+    @Override
     public Pageable resolveArgument(final MethodParameter methodParameter,
                                     final ModelAndViewContainer modelAndViewContainer,
                                     final NativeWebRequest nativeWebRequest,
                                     final WebDataBinderFactory webDataBinderFactory) {
-        final RequestJsonApiPage RequestJsonApiPage = methodParameter.getParameterAnnotation(RequestJsonApiPage.class);
-        final String pageKeyStart = RequestJsonApiPage.name() + REQUEST_PAGE_KEY_BRACKET_START;
-        final Sort sort = parseSortField(nativeWebRequest);
-        int page = 0;
-        int size = 25;
+
+        final SortDefault sortDefault = methodParameter.getParameterAnnotation(SortDefault.class);
+        final SortDefaults sortDefaults = methodParameter.getParameterAnnotation(SortDefaults.class);
+        final PageableDefault pageableDefault = methodParameter.getParameterAnnotation(PageableDefault.class);
+
+        if (sortDefault != null && sortDefaults != null) {
+            throw new IllegalArgumentException(
+                String.format(
+                    "Cannot use both @%s and @%s on parameter %s; Move %s into %s to define sorting order",
+                    SortDefaults.class.getSimpleName(),
+                    SortDefault.class.getSimpleName(),
+                    methodParameter.toString(),
+                    SortDefault.class.getSimpleName(),
+                    SortDefaults.class.getSimpleName()
+                )
+            );
+        }
+
+        final RequestJsonApiPage requestJsonApiPage = methodParameter.getParameterAnnotation(RequestJsonApiPage.class);
+
+        final String pageKeyStart = requestJsonApiPage.name() + REQUEST_PAGE_KEY_BRACKET_START;
+
+        final Sort sort = parseSortField(nativeWebRequest, sortDefault, sortDefaults, pageableDefault);
+        int page = pageableDefault == null ?  0 : pageableDefault.page();
+        int size = pageableDefault == null ? 10 : pageableDefault.size();
 
         final List<Map.Entry<String, String[]>> entries = nativeWebRequest.getParameterMap()
             .entrySet()
@@ -101,10 +137,42 @@ public class JsonApiPageArgumentResolver implements HandlerMethodArgumentResolve
         return valueItems;
     }
 
-    private Sort parseSortField(final NativeWebRequest nativeWebRequest) {
+    @Nullable
+    private Sort parseSortField(
+        final NativeWebRequest nativeWebRequest,
+        @Nullable final SortDefault sortDefault,
+        @Nullable final SortDefaults sortDefaults,
+        @Nullable final PageableDefault pageableDefault
+    ) {
+
         if (CollectionUtils.isEmpty(nativeWebRequest.getParameterMap())
                 || nativeWebRequest.getParameterMap().get("sort") == null) {
+
+            SortDefault[] sortDefaultArray =
+                sortDefaults != null ?
+                    sortDefaults.value() :
+                    sortDefault != null ?
+                        new SortDefault[]{sortDefault} :
+                        new SortDefault[0];
+
+            // Takes the sort from sortDefalt(s)
+            if (sortDefaultArray.length > 0) {
+                return Arrays.stream(sortDefaultArray).map(
+                    currentSortDefault -> Sort.by(
+                        currentSortDefault.direction(),
+                        currentSortDefault.sort()
+                    )
+                ).reduce(
+                    Sort.unsorted(),
+                    Sort::and
+                );
+            // Takes the sort from pageableDefault
+            } else if (pageableDefault != null && pageableDefault.sort().length > 0) {
+                return Sort.by(pageableDefault.direction(), pageableDefault.sort());
+            }
+
             return null;
+
         }
         final var sortOrders = Arrays.stream(nativeWebRequest.getParameterMap()
             .get("sort"))
